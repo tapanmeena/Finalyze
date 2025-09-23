@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
 import { useRouter } from 'expo-router';
-import { db } from './database';
+import React, { useEffect, useState } from 'react';
+import {
+    FlatList,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { db } from '../utils/database';
 
 interface Expense {
   id: number;
@@ -43,22 +43,12 @@ export default function Expenses() {
   }, [searchQuery, expenses]);
 
   const loadExpenses = () => {
-    db.transaction((tx: any) => {
-      tx.executeSql(
-        'SELECT * FROM expenses ORDER BY date DESC',
-        [],
-        (_: any, { rows }: any) => {
-          const expenseList: Expense[] = [];
-          for (let i = 0; i < rows.length; i++) {
-            expenseList.push(rows.item(i));
-          }
-          setExpenses(expenseList);
-        },
-        (error: any) => {
-          console.error('Error loading expenses:', error);
-        }
-      );
-    });
+    try {
+      const result = db.getAllSync('SELECT * FROM expenses ORDER BY date DESC');
+      setExpenses(result as Expense[]);
+    } catch (error) {
+      console.error('Error loading expenses:', error);
+    }
   };
 
   const formatDate = (dateString: string) => {

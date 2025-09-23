@@ -1,15 +1,15 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { db } from './database';
+import { db } from '../utils/database';
 
 const categories = [
   'Food',
@@ -49,21 +49,19 @@ export default function AddExpense() {
       return;
     }
 
-    db.transaction((tx: any) => {
-      tx.executeSql(
+    try {
+      db.runSync(
         'INSERT INTO expenses (amount, date, category, paymentMethod, description) VALUES (?, ?, ?, ?, ?)',
-        [expenseAmount, date, selectedCategory, selectedPaymentMethod, description],
-        () => {
-          Alert.alert('Success', 'Expense added successfully', [
-            { text: 'OK', onPress: () => router.back() }
-          ]);
-        },
-        (error: any) => {
-          Alert.alert('Error', 'Failed to save expense');
-          console.error(error);
-        }
+        [expenseAmount, date, selectedCategory, selectedPaymentMethod, description]
       );
-    });
+      
+      Alert.alert('Success', 'Expense added successfully', [
+        { text: 'OK', onPress: () => router.back() }
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save expense');
+      console.error('Database error:', error);
+    }
   };
 
   return (

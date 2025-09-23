@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
-import { db } from './database';
+import { db } from '../utils/database';
 
 interface CategoryExpense {
   category: string;
@@ -26,38 +26,33 @@ export default function Analytics() {
     const monthAgo = new Date();
     monthAgo.setMonth(monthAgo.getMonth() - 1);
 
-    db.transaction((tx: any) => {
-      tx.executeSql(
+    try {
+      const result = db.getAllSync(
         'SELECT category, SUM(amount) as total FROM expenses WHERE date >= ? GROUP BY category ORDER BY total DESC',
-        [monthAgo.toISOString().split('T')[0]],
-        (_: any, { rows }: any) => {
-          const categories: CategoryExpense[] = [];
-          let grandTotal = 0;
+        [monthAgo.toISOString().split('T')[0]]
+      ) as any[];
 
-          for (let i = 0; i < rows.length; i++) {
-            const row = rows.item(i);
-            grandTotal += row.total;
-            categories.push({
-              category: row.category,
-              total: row.total,
-              percentage: 0, // Will calculate after we have grand total
-            });
-          }
+      let grandTotal = 0;
+      const categories: CategoryExpense[] = result.map(row => {
+        grandTotal += row.total;
+        return {
+          category: row.category,
+          total: row.total,
+          percentage: 0, // Will calculate after we have grand total
+        };
+      });
 
-          // Calculate percentages
-          const categoriesWithPercentage = categories.map(cat => ({
-            ...cat,
-            percentage: grandTotal > 0 ? (cat.total / grandTotal) * 100 : 0,
-          }));
+      // Calculate percentages
+      const categoriesWithPercentage = categories.map(cat => ({
+        ...cat,
+        percentage: grandTotal > 0 ? (cat.total / grandTotal) * 100 : 0,
+      }));
 
-          setCategoryData(categoriesWithPercentage);
-          setTotalExpenses(grandTotal);
-        },
-        (error: any) => {
-          console.error('Error loading analytics:', error);
-        }
-      );
-    });
+      setCategoryData(categoriesWithPercentage);
+      setTotalExpenses(grandTotal);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    }
   };
 
   const getBarColor = (index: number) => {
