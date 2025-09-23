@@ -152,16 +152,28 @@ export default function ProfileScreen() {
       colors={[theme.colors.primary, theme.colors.secondary]}
       style={[
         styles.profileHeader,
-        { borderBottomLeftRadius: 24, borderBottomRightRadius: 24, paddingTop: 56, paddingBottom: 24, paddingHorizontal: 20 },
+        {
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.18,
+          shadowRadius: 8,
+          elevation: 8,
+        },
       ]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Ionicons name="person-circle" size={48} color="white" style={{ marginRight: 16 }} />
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{userName.charAt(0).toUpperCase()}</Text>
+          </View>
+        </View>
         <View>
-          <Text style={{ fontSize: 26, fontWeight: "bold", color: "white" }}>Profile</Text>
-          <Text style={{ fontSize: 14, color: "rgba(255,255,255,0.8)" }}>Manage your financial journey</Text>
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.userSubtitle}>Manage your financial journey</Text>
         </View>
       </View>
     </LinearGradient>
@@ -234,7 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileHeader: {
-    padding: 32,
+    padding: 24,
     alignItems: "center",
     marginBottom: 24,
   },
