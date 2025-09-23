@@ -1,19 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-    Alert,
-    Keyboard,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Alert,
+  Animated,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 import { db, getSuggestionForExpense } from '../utils/database';
 
 const paymentMethods = [
@@ -33,10 +36,19 @@ export default function AddExpense() {
   const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   
   const router = useRouter();
+  const { theme } = useTheme();
+  const fadeAnim = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
     loadCategories();
-  }, []);
+    
+    // Fade in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const loadCategories = () => {
     try {
@@ -102,120 +114,164 @@ export default function AddExpense() {
 
   return (
     <KeyboardAvoidingView 
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView 
-          style={styles.container}
+          style={[styles.container, { backgroundColor: theme.colors.background }]}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scrollContent}
         >
-          <Text style={styles.title}>Add New Expense</Text>
+          <Animated.View style={{ opacity: fadeAnim }}>
+            <Text style={[styles.title, { color: theme.colors.text }]}>Add New Expense</Text>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Amount *</Text>
-        <TextInput
-          style={styles.input}
-          value={amount}
-          onChangeText={setAmount}
-          placeholder="0.00"
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Date *</Text>
-        <TextInput
-          style={styles.input}
-          value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Category *</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryButton,
-                selectedCategory === category && styles.selectedCategory
-              ]}
-              onPress={() => setSelectedCategory(category)}
-            >
-              <Text style={[
-                styles.categoryText,
-                selectedCategory === category && styles.selectedCategoryText
-              ]}>
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        <TouchableOpacity 
-          style={styles.manageCategoriesButton}
-          onPress={() => router.push('./categories')}
-        >
-          <Text style={styles.manageCategoriesText}>+ Manage Categories</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Payment Method *</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {paymentMethods.map((method) => (
-            <TouchableOpacity
-              key={method}
-              style={[
-                styles.categoryButton,
-                selectedPaymentMethod === method && styles.selectedCategory
-              ]}
-              onPress={() => setSelectedPaymentMethod(method)}
-            >
-              <Text style={[
-                styles.categoryText,
-                selectedPaymentMethod === method && styles.selectedCategoryText
-              ]}>
-                {method}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          value={description}
-          onChangeText={handleDescriptionChange}
-          placeholder="Optional description..."
-          multiline
-          numberOfLines={3}
-        />
-        {suggestedCategory && (
-          <TouchableOpacity style={styles.suggestionBanner} onPress={applySuggestion}>
-            <View style={styles.suggestionContent}>
-              <Ionicons name="bulb-outline" size={16} color="#FF9800" />
-              <Text style={styles.suggestionText}>
-                Suggested category: <Text style={styles.suggestionCategory}>{suggestedCategory}</Text>
-              </Text>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: theme.colors.text }]}>Amount *</Text>
+              <TextInput
+                style={[styles.input, { 
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text 
+                }]}
+                value={amount}
+                onChangeText={setAmount}
+                placeholder="0.00"
+                placeholderTextColor={theme.colors.textSecondary}
+                keyboardType="numeric"
+              />
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#FF9800" />
-          </TouchableOpacity>
-        )}
-      </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveExpense}>
-        <Text style={styles.saveButtonText}>Save Expense</Text>
-      </TouchableOpacity>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: theme.colors.text }]}>Date *</Text>
+              <TextInput
+                style={[styles.input, { 
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text 
+                }]}
+                value={date}
+                onChangeText={setDate}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor={theme.colors.textSecondary}
+              />
+            </View>
 
-      <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
-        <Text style={styles.cancelButtonText}>Cancel</Text>
-      </TouchableOpacity>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: theme.colors.text }]}>Category *</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {categories.map((category) => (
+                  <TouchableOpacity
+                    key={category}
+                    style={[
+                      styles.categoryButton,
+                      { 
+                        backgroundColor: selectedCategory === category ? theme.colors.primary : theme.colors.surface,
+                        borderColor: theme.colors.border 
+                      }
+                    ]}
+                    onPress={() => {
+                      setSelectedCategory(category);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <Text style={[
+                      styles.categoryText,
+                      { 
+                        color: selectedCategory === category ? 'white' : theme.colors.text 
+                      }
+                    ]}>
+                      {category}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <TouchableOpacity 
+                style={[styles.manageCategoriesButton, { backgroundColor: theme.colors.accent }]}
+                onPress={() => {
+                  router.push('./categories');
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }}
+              >
+                <Text style={styles.manageCategoriesText}>+ Manage Categories</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: theme.colors.text }]}>Payment Method *</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {paymentMethods.map((method) => (
+                  <TouchableOpacity
+                    key={method}
+                    style={[
+                      styles.categoryButton,
+                      { 
+                        backgroundColor: selectedPaymentMethod === method ? theme.colors.primary : theme.colors.surface,
+                        borderColor: theme.colors.border 
+                      }
+                    ]}
+                    onPress={() => {
+                      setSelectedPaymentMethod(method);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                  >
+                    <Text style={[
+                      styles.categoryText,
+                      { 
+                        color: selectedPaymentMethod === method ? 'white' : theme.colors.text 
+                      }
+                    ]}>
+                      {method}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: theme.colors.text }]}>Description</Text>
+              <TextInput
+                style={[styles.input, styles.textArea, { 
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text 
+                }]}
+                value={description}
+                onChangeText={handleDescriptionChange}
+                placeholder="Optional description..."
+                placeholderTextColor={theme.colors.textSecondary}
+                multiline={true}
+                numberOfLines={3}
+              />
+            </View>
+
+            {suggestedCategory && (
+              <TouchableOpacity 
+                style={[styles.suggestionBanner, { backgroundColor: theme.colors.warning }]} 
+                onPress={() => {
+                  applySuggestion();
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                }}
+              >
+                <View style={styles.suggestionContent}>
+                  <Ionicons name="bulb-outline" size={16} color="white" />
+                  <Text style={[styles.suggestionText, { color: 'white' }]}>
+                    Suggested category: <Text style={styles.suggestionCategory}>{suggestedCategory}</Text>
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity 
+              style={[styles.saveButton, { backgroundColor: theme.colors.primary }]} 
+              onPress={() => {
+                handleSaveExpense();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              }}
+            >
+              <Text style={styles.saveButtonText}>Save Expense</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

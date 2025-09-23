@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 import { db, initDB, recreateDatabase } from '../utils/database';
 
 interface ExpenseSum {
@@ -16,6 +17,7 @@ export default function Dashboard() {
     thisMonth: 0
   });
   const router = useRouter();
+  const { theme } = useTheme();
 
   useEffect(() => {
     initDB();
@@ -105,84 +107,105 @@ export default function Dashboard() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Spend Log Dashboard</Text>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.title, { color: theme.colors.text }]}>Spend Log Dashboard</Text>
       
       <View style={styles.summaryContainer}>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Today</Text>
-          <Text style={styles.summaryAmount}>${expenseSums.today.toFixed(2)}</Text>
+        <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
+          <Text style={[styles.summaryLabel, { color: theme.colors.textSecondary }]}>Today</Text>
+          <Text style={[styles.summaryAmount, { color: theme.colors.text }]}>${expenseSums.today.toFixed(2)}</Text>
         </View>
         
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>This Week</Text>
-          <Text style={styles.summaryAmount}>${expenseSums.thisWeek.toFixed(2)}</Text>
+        <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
+          <Text style={[styles.summaryLabel, { color: theme.colors.textSecondary }]}>This Week</Text>
+          <Text style={[styles.summaryAmount, { color: theme.colors.text }]}>${expenseSums.thisWeek.toFixed(2)}</Text>
         </View>
         
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>This Month</Text>
-          <Text style={styles.summaryAmount}>${expenseSums.thisMonth.toFixed(2)}</Text>
+        <View style={[styles.summaryCard, { backgroundColor: theme.colors.surface, shadowColor: theme.colors.shadow }]}>
+          <Text style={[styles.summaryLabel, { color: theme.colors.textSecondary }]}>This Month</Text>
+          <Text style={[styles.summaryAmount, { color: theme.colors.text }]}>${expenseSums.thisMonth.toFixed(2)}</Text>
         </View>
       </View>
 
       <TouchableOpacity 
-        style={styles.addButton}
+        style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
         onPress={() => router.push('./add-expense')}
       >
         <Text style={styles.addButtonText}>+ Add Expense</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.viewButton}
+        style={[styles.viewButton, { backgroundColor: theme.colors.secondary }]}
         onPress={() => router.push('./expenses')}
       >
         <Text style={styles.viewButtonText}>View All Expenses</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.analyticsButton}
+        style={[styles.analyticsButton, { backgroundColor: theme.colors.accent }]}
         onPress={() => router.push('./analytics')}
       >
         <Text style={styles.analyticsButtonText}>View Analytics</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.recurringButton}
+        style={[styles.recurringButton, { backgroundColor: theme.colors.warning }]}
         onPress={() => router.push('./recurring')}
       >
         <Text style={styles.recurringButtonText}>Recurring Expenses</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.billsButton}
+        style={[styles.billsButton, { backgroundColor: theme.colors.primary }]}
         onPress={() => router.push('./bills')}
       >
         <Text style={styles.billsButtonText}>Bills Tracker</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.suggestionsButton}
+        style={[styles.suggestionsButton, { backgroundColor: '#9C27B0' }]}
         onPress={() => router.push('./suggestions')}
       >
         <Text style={styles.suggestionsButtonText}>Smart Categories</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.budgetButton}
+        style={[styles.budgetButton, { backgroundColor: '#5856D6' }]}
         onPress={() => router.push('./budget')}
       >
         <Text style={styles.budgetButtonText}>Manage Budget</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.categoriesButton}
+        style={[styles.categoriesButton, { backgroundColor: '#AF52DE' }]}
         onPress={() => router.push('./categories')}
       >
         <Text style={styles.categoriesButtonText}>Manage Categories</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.debugButton}
+        style={[styles.themesButton, { backgroundColor: theme.colors.accent }]}
+        onPress={() => router.push('./themes')}
+      >
+        <Text style={styles.themesButtonText}>🎨 Themes & Appearance</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.milestonesButton, { backgroundColor: theme.colors.success }]}
+        onPress={() => router.push('./milestones')}
+      >
+        <Text style={styles.milestonesButtonText}>🏆 Milestones & Progress</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.insightsButton, { backgroundColor: '#FF6B35' }]}
+        onPress={() => router.push('./insights')}
+      >
+        <Text style={styles.insightsButtonText}>💡 Financial Insights</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.debugButton, { backgroundColor: theme.colors.error }]}
         onPress={handleRecreateDatabase}
       >
         <Text style={styles.debugButtonText}>🔧 Dev Tools (Sample Data)</Text>
@@ -342,6 +365,42 @@ const styles = StyleSheet.create({
   debugButtonText: {
     color: 'white',
     fontSize: 14,
+    fontWeight: 'bold',
+  },
+  themesButton: {
+    backgroundColor: '#FF9500',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  themesButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  milestonesButton: {
+    backgroundColor: '#34C759',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  milestonesButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  insightsButton: {
+    backgroundColor: '#FF6B35',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  insightsButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
