@@ -48,6 +48,7 @@ export default function RootLayout() {
             headerTitleStyle: {
               fontWeight: "bold",
             },
+            headerShown: false,
           }}
         />
         <Stack.Screen

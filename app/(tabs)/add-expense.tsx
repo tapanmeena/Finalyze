@@ -514,7 +514,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
   },
   manageCategoriesText: {
     fontSize: 14,
