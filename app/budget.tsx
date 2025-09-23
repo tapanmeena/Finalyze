@@ -1,3 +1,4 @@
+import { db } from '@/utils/database';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
@@ -9,7 +10,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { db } from '../utils/database';
 
 interface BudgetItem {
   id: number;

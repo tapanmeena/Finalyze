@@ -1,7 +1,7 @@
+import { Theme, ThemeKey, themes, useTheme } from '@/contexts/ThemeContext';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Theme, ThemeKey, themes, useTheme } from '../contexts/ThemeContext';
 
 export default function ThemeScreen() {
   const { theme, currentTheme, setTheme, toggleDarkMode } = useTheme();

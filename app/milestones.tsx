@@ -1,8 +1,8 @@
+import { useTheme } from '@/contexts/ThemeContext';
+import { db } from '@/utils/database';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { db } from '../utils/database';
 
 interface Milestone {
   id: string;

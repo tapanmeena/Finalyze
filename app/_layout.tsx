@@ -1,159 +1,113 @@
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Stack } from "expo-router";
-import { ThemeProvider } from "../contexts/ThemeContext";
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
       <Stack>
-        <Stack.Screen 
-          name="index" 
+        <Stack.Screen
+          name="(tabs)"
           options={{
-            title: "Dashboard",
-            headerStyle: {
-              backgroundColor: '#007AFF',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} 
+            headerShown: false,
+          }}
         />
-        <Stack.Screen 
-          name="add-expense" 
-          options={{
-            title: "Add Expense",
-            headerStyle: {
-              backgroundColor: '#007AFF',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} 
-        />
-        <Stack.Screen 
-          name="expenses" 
+        <Stack.Screen
+          name="expenses"
           options={{
             title: "All Expenses",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="analytics" 
-          options={{
-            title: "Analytics",
-            headerStyle: {
-              backgroundColor: '#007AFF',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} 
-        />
-        <Stack.Screen 
-          name="budget" 
+        <Stack.Screen
+          name="budget"
           options={{
             title: "Budget Management",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="categories" 
+        <Stack.Screen
+          name="categories"
           options={{
             title: "Manage Categories",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="recurring" 
+        <Stack.Screen
+          name="recurring"
           options={{
             title: "Recurring Expenses",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="bills" 
+        <Stack.Screen
+          name="bills"
           options={{
             title: "Bills Tracker",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="suggestions" 
+        <Stack.Screen
+          name="suggestions"
           options={{
             title: "Smart Categories",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="themes" 
+        <Stack.Screen
+          name="themes"
           options={{
             title: "Themes",
             headerShown: false,
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="milestones" 
+        <Stack.Screen
+          name="milestones"
           options={{
             title: "Milestones",
             headerStyle: {
-              backgroundColor: '#007AFF',
+              backgroundColor: "#007AFF",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
+              fontWeight: "bold",
             },
-          }} 
-        />
-        <Stack.Screen 
-          name="insights" 
-          options={{
-            title: "Financial Insights",
-            headerStyle: {
-              backgroundColor: '#007AFF',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }} 
+          }}
         />
       </Stack>
     </ThemeProvider>

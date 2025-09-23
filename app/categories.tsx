@@ -1,3 +1,4 @@
+import { db } from "@/utils/database";
 import React, { useEffect, useState } from "react";
 import {
     Alert,
@@ -13,7 +14,6 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { db } from "../utils/database";
 
 interface Category {
   id: number;

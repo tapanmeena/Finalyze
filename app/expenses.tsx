@@ -1,3 +1,4 @@
+import { db } from '@/utils/database';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -10,7 +11,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { db } from '../utils/database';
 
 interface Expense {
   id: number;
