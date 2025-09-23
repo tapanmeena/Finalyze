@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     ScrollView,
@@ -11,16 +11,6 @@ import {
 } from 'react-native';
 import { db } from '../utils/database';
 
-const categories = [
-  'Food',
-  'Transport',
-  'Entertainment',
-  'Shopping',
-  'Bills',
-  'Healthcare',
-  'Other'
-];
-
 const paymentMethods = [
   'Cash',
   'Credit Card',
@@ -30,12 +20,28 @@ const paymentMethods = [
 
 export default function AddExpense() {
   const [amount, setAmount] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   
   const router = useRouter();
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = () => {
+    try {
+      const result = db.getAllSync('SELECT name FROM categories ORDER BY name') as any[];
+      setCategories(result.map(row => row.name));
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      // Fallback to hardcoded categories if database fails
+      setCategories(['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills', 'Healthcare', 'Other']);
+    }
+  };
 
   const handleSaveExpense = () => {
     if (!amount || !selectedCategory || !selectedPaymentMethod) {
@@ -110,6 +116,12 @@ export default function AddExpense() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        <TouchableOpacity 
+          style={styles.manageCategoriesButton}
+          onPress={() => router.push('./categories')}
+        >
+          <Text style={styles.manageCategoriesText}>+ Manage Categories</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.inputGroup}>
@@ -212,6 +224,16 @@ const styles = StyleSheet.create({
   },
   selectedCategoryText: {
     color: 'white',
+  },
+  manageCategoriesButton: {
+    marginTop: 10,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  manageCategoriesText: {
+    color: '#007AFF',
+    fontSize: 14,
+    fontWeight: '500',
   },
   saveButton: {
     backgroundColor: '#007AFF',

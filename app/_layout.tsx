@@ -55,6 +55,32 @@ export default function RootLayout() {
           },
         }} 
       />
+      <Stack.Screen 
+        name="budget" 
+        options={{
+          title: "Budget Management",
+          headerStyle: {
+            backgroundColor: '#007AFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }} 
+      />
+      <Stack.Screen 
+        name="categories" 
+        options={{
+          title: "Manage Categories",
+          headerStyle: {
+            backgroundColor: '#007AFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }} 
+      />
     </Stack>
   );
 }

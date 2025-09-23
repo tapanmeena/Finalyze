@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { db, initDB } from '../utils/database';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { db, initDB, recreateDatabase } from '../utils/database';
 
 interface ExpenseSum {
   today: number;
@@ -52,6 +52,58 @@ export default function Dashboard() {
     }
   };
 
+  const handleRecreateDatabase = () => {
+    Alert.alert(
+      'Database Options',
+      'Choose an option:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Add Sample Data', 
+          onPress: () => {
+            try {
+              // Add sample expenses for testing
+              const sampleExpenses = [
+                { amount: 25.50, category: 'Food', paymentMethod: 'Card', description: 'Lunch at restaurant', date: '2025-09-20' },
+                { amount: 60.00, category: 'Transport', paymentMethod: 'Card', description: 'Gas for car', date: '2025-09-21' },
+                { amount: 120.00, category: 'Shopping', paymentMethod: 'Card', description: 'Groceries', date: '2025-09-21' },
+                { amount: 45.00, category: 'Entertainment', paymentMethod: 'Cash', description: 'Movie tickets', date: '2025-09-22' },
+                { amount: 80.00, category: 'Bills', paymentMethod: 'Card', description: 'Electricity bill', date: '2025-09-22' },
+                { amount: 15.00, category: 'Food', paymentMethod: 'Card', description: 'Coffee shop', date: '2025-09-23' },
+                { amount: 200.00, category: 'Healthcare', paymentMethod: 'Card', description: 'Doctor visit', date: '2025-09-23' },
+              ];
+
+              sampleExpenses.forEach(expense => {
+                db.runSync(
+                  'INSERT INTO expenses (amount, date, category, paymentMethod, description) VALUES (?, ?, ?, ?, ?)',
+                  [expense.amount, expense.date, expense.category, expense.paymentMethod, expense.description]
+                );
+              });
+
+              loadExpenseSums();
+              Alert.alert('Success', 'Sample data added successfully!');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to add sample data: ' + error);
+            }
+          }
+        },
+        { 
+          text: 'Recreate DB', 
+          style: 'destructive',
+          onPress: () => {
+            try {
+              recreateDatabase();
+              loadExpenseSums();
+              Alert.alert('Success', 'Database recreated successfully!');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to recreate database: ' + error);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Spend Log Dashboard</Text>
@@ -92,6 +144,27 @@ export default function Dashboard() {
         onPress={() => router.push('./analytics')}
       >
         <Text style={styles.analyticsButtonText}>View Analytics</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.budgetButton}
+        onPress={() => router.push('./budget')}
+      >
+        <Text style={styles.budgetButtonText}>Manage Budget</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.categoriesButton}
+        onPress={() => router.push('./categories')}
+      >
+        <Text style={styles.categoriesButtonText}>Manage Categories</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.debugButton}
+        onPress={handleRecreateDatabase}
+      >
+        <Text style={styles.debugButtonText}>🔧 Dev Tools (Sample Data)</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -171,10 +244,47 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    marginBottom: 15,
   },
   analyticsButtonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  budgetButton: {
+    backgroundColor: '#5856D6',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  budgetButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  categoriesButton: {
+    backgroundColor: '#AF52DE',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  categoriesButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  debugButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  debugButtonText: {
+    color: 'white',
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });
