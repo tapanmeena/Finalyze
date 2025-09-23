@@ -3,19 +3,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Keyboard,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Alert,
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 
 interface Bill {
@@ -183,7 +183,7 @@ export default function BillsScreen() {
               {item.name}
             </Text>
             <Text style={[styles.billAmount, item.isPaid && styles.paidText]}>
-              ${item.amount.toFixed(2)}
+              ₹{item.amount.toFixed(2)}
             </Text>
           </View>
           {!item.isPaid && (

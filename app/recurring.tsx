@@ -3,20 +3,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Keyboard,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Alert,
+  FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 
 interface RecurringExpense {
@@ -164,7 +164,7 @@ export default function RecurringExpensesScreen() {
             {item.name}
           </Text>
           <Text style={[styles.expenseAmount, !item.isActive && styles.inactiveText]}>
-            ${item.amount.toFixed(2)}
+            ₹{item.amount.toFixed(2)}
           </Text>
         </View>
         <Switch
@@ -235,7 +235,7 @@ export default function RecurringExpensesScreen() {
           {recurringExpenses.filter(e => e.isActive).length} active recurring expenses
         </Text>
         <Text style={styles.summaryAmount}>
-          Monthly total: ${recurringExpenses
+          Monthly total: ₹{recurringExpenses
             .filter(e => e.isActive && e.frequency === 'monthly')
             .reduce((sum, e) => sum + e.amount, 0)
             .toFixed(2)}

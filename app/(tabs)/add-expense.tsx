@@ -251,7 +251,7 @@ export default function AddExpense() {
                 ]}
                 activeOpacity={0.85}
                 onPress={() => {
-                  router.push("./categories");
+                  router.push("/categories");
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 }}
               >

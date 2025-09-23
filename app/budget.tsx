@@ -1,14 +1,14 @@
 import { db } from '@/utils/database';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface BudgetItem {
@@ -192,13 +192,13 @@ export default function BudgetScreen() {
         </View>
         
         <View style={styles.progressInfo}>
-          <Text style={styles.budgetAmount}>Budget: ${item.budgetAmount.toFixed(2)}</Text>
-          <Text style={styles.spentAmount}>Spent: ${item.spent.toFixed(2)}</Text>
+          <Text style={styles.budgetAmount}>Budget: ₹{item.budgetAmount.toFixed(2)}</Text>
+          <Text style={styles.spentAmount}>Spent: ₹{item.spent.toFixed(2)}</Text>
           <Text style={[
             styles.remainingAmount,
             { color: item.remaining >= 0 ? '#34C759' : '#FF3B30' }
           ]}>
-            {item.remaining >= 0 ? 'Remaining' : 'Over budget'}: ${Math.abs(item.remaining).toFixed(2)}
+            {item.remaining >= 0 ? 'Remaining' : 'Over budget'}: ₹{Math.abs(item.remaining).toFixed(2)}
           </Text>
         </View>
 

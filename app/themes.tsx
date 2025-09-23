@@ -1,7 +1,7 @@
-import { Theme, ThemeKey, themes, useTheme } from '@/contexts/ThemeContext';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Theme, ThemeKey, themes, useTheme } from "@/contexts/ThemeContext";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ThemeScreen() {
   const { theme, currentTheme, setTheme } = useTheme();
@@ -24,9 +24,7 @@ export default function ThemeScreen() {
         onPress={() => setTheme(themeKey)}
       >
         <View style={styles.themeHeader}>
-          <Text style={[styles.themeName, { color: theme.colors.text }]}>
-            {themeData.name}
-          </Text>
+          <Text style={[styles.themeName, { color: theme.colors.text }]}>{themeData.name}</Text>
           {isSelected && (
             <View style={[styles.selectedBadge, { backgroundColor: theme.colors.primary }]}>
               <Text style={styles.selectedText}>✓</Text>
@@ -42,37 +40,32 @@ export default function ThemeScreen() {
           <View style={[styles.colorSwatch, { backgroundColor: themeData.colors.warning }]} />
         </View>
 
-        <Text style={[styles.themeDescription, { color: theme.colors.textSecondary }]}>
-          {getThemeDescription(themeKey)}
-        </Text>
+        <Text style={[styles.themeDescription, { color: theme.colors.textSecondary }]}>{getThemeDescription(themeKey)}</Text>
       </TouchableOpacity>
     );
   };
 
   const getThemeDescription = (themeKey: ThemeKey): string => {
     switch (themeKey) {
-      case 'light':
-        return 'Clean and bright appearance for daytime use';
-      case 'dark':
-        return 'Easy on the eyes for low-light environments';
-      case 'ocean':
-        return 'Cool blues and calming ocean-inspired colors';
-      case 'sunset':
-        return 'Warm oranges and vibrant sunset hues';
-      case 'forest':
-        return 'Natural greens and earth-tone colors';
+      case "light":
+        return "Clean and bright appearance for daytime use";
+      case "dark":
+        return "Easy on the eyes for low-light environments";
+      case "ocean":
+        return "Cool blues and calming ocean-inspired colors";
+      case "sunset":
+        return "Warm oranges and vibrant sunset hues";
+      case "forest":
+        return "Natural greens and earth-tone colors";
       default:
-        return 'A beautiful color scheme for your app';
+        return "A beautiful color scheme for your app";
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: theme.colors.surface }]}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: theme.colors.surface }]} onPress={() => router.back()}>
           <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>← Back</Text>
         </TouchableOpacity>
         <Text style={[styles.title, { color: theme.colors.text }]}>Choose Theme</Text>
@@ -80,28 +73,19 @@ export default function ThemeScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-            Available Themes
-          </Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Available Themes</Text>
           <Text style={[styles.sectionDescription, { color: theme.colors.textSecondary }]}>
             Select a theme to customize your app&apos;s appearance
           </Text>
         </View>
 
-        <View style={styles.themesContainer}>
-          {Object.entries(themes).map(([key, themeData]) =>
-            renderThemeOption(key as ThemeKey, themeData)
-          )}
-        </View>
-
-
+        <View style={styles.themesContainer}>{Object.entries(themes).map(([key, themeData]) => renderThemeOption(key as ThemeKey, themeData))}</View>
 
         <View style={styles.infoSection}>
-          <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
-            About Themes
-          </Text>
+          <Text style={[styles.infoTitle, { color: theme.colors.text }]}>About Themes</Text>
           <Text style={[styles.infoText, { color: theme.colors.textSecondary }]}>
-            Themes change the color scheme throughout the entire app. Your selection is automatically saved and will be applied the next time you open the app.
+            Themes change the color scheme throughout the entire app. Your selection is automatically saved and will be applied the next time you open
+            the app.
           </Text>
         </View>
       </ScrollView>
@@ -114,10 +98,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: Platform.OS === "ios" ? 60 : 0,
     paddingBottom: 20,
   },
   backButton: {
@@ -128,11 +112,11 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     flex: 1,
   },
   content: {
@@ -144,7 +128,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   sectionDescription: {
@@ -158,7 +142,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 15,
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -168,29 +152,29 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   themeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 15,
   },
   themeName: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   selectedBadge: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   colorPreview: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 15,
   },
   colorSwatch: {
@@ -208,7 +192,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   infoText: {

@@ -1,17 +1,9 @@
-import { useTheme } from '@/contexts/ThemeContext';
-import { db } from '@/utils/database';
-import { MaterialIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import React, { useEffect, useState } from 'react';
-import {
-  Animated,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useTheme } from "@/contexts/ThemeContext";
+import { db } from "@/utils/database";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import React, { useEffect, useState } from "react";
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface CategoryExpense {
   category: string;
@@ -22,23 +14,22 @@ interface CategoryExpense {
 export default function Analytics() {
   const [categoryData, setCategoryData] = useState<CategoryExpense[]>([]);
   const [totalExpenses, setTotalExpenses] = useState(0);
-  const [chartType, setChartType] = useState<'bar' | 'pie'>('bar');
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month');
-  
+  const [chartType, setChartType] = useState<"bar" | "pie">("bar");
+  const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("month");
+
   const { theme } = useTheme();
   const fadeAnim = React.useMemo(() => new Animated.Value(0), []);
-  const screenWidth = Dimensions.get('window').width;
 
   const loadAnalytics = React.useCallback(() => {
     // Calculate date range based on selected timeRange
     const now = new Date();
     let startDate: Date;
-    
+
     switch (timeRange) {
-      case 'week':
+      case "week":
         startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         break;
-      case 'year':
+      case "year":
         startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
         break;
       default: // month
@@ -48,13 +39,12 @@ export default function Analytics() {
     }
 
     try {
-      const result = db.getAllSync(
-        'SELECT category, SUM(amount) as total FROM expenses WHERE date >= ? GROUP BY category ORDER BY total DESC',
-        [startDate.toISOString().split('T')[0]]
-      ) as any[];
+      const result = db.getAllSync("SELECT category, SUM(amount) as total FROM expenses WHERE date >= ? GROUP BY category ORDER BY total DESC", [
+        startDate.toISOString().split("T")[0],
+      ]) as any[];
 
       let grandTotal = 0;
-      const categories: CategoryExpense[] = result.map(row => {
+      const categories: CategoryExpense[] = result.map((row) => {
         grandTotal += row.total;
         return {
           category: row.category,
@@ -64,7 +54,7 @@ export default function Analytics() {
       });
 
       // Calculate percentages
-      const categoriesWithPercentage = categories.map(cat => ({
+      const categoriesWithPercentage = categories.map((cat) => ({
         ...cat,
         percentage: grandTotal > 0 ? (cat.total / grandTotal) * 100 : 0,
       }));
@@ -72,13 +62,13 @@ export default function Analytics() {
       setCategoryData(categoriesWithPercentage);
       setTotalExpenses(grandTotal);
     } catch (error) {
-      console.error('Error loading analytics:', error);
+      console.error("Error loading analytics:", error);
     }
   }, [timeRange]);
 
   useEffect(() => {
     loadAnalytics();
-    
+
     // Fade in animation
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -89,35 +79,30 @@ export default function Analytics() {
 
   const getCategoryIcon = (category: string) => {
     const iconMap: { [key: string]: string } = {
-      'Food': 'restaurant',
-      'Transport': 'directions-car',
-      'Entertainment': 'movie',
-      'Shopping': 'shopping-bag',
-      'Bills': 'receipt',
-      'Healthcare': 'local-hospital',
-      'Other': 'category',
+      Food: "restaurant",
+      Transport: "directions-car",
+      Entertainment: "movie",
+      Shopping: "shopping-bag",
+      Bills: "receipt",
+      Healthcare: "local-hospital",
+      Other: "category",
     };
-    return iconMap[category] || 'category';
+    return iconMap[category] || "category";
   };
 
   const getTimeRangeLabel = () => {
     switch (timeRange) {
-      case 'week': return 'Last 7 Days';
-      case 'year': return 'Last Year';
-      default: return 'Last Month';
+      case "week":
+        return "Last 7 Days";
+      case "year":
+        return "Last Year";
+      default:
+        return "Last Month";
     }
   };
 
   const getBarColor = (index: number) => {
-    const colors = [
-      '#007AFF',
-      '#34C759',
-      '#FF9500',
-      '#FF3B30',
-      '#AF52DE',
-      '#5AC8FA',
-      '#FFCC00',
-    ];
+    const colors = ["#007AFF", "#34C759", "#FF9500", "#FF3B30", "#AF52DE", "#5AC8FA", "#FFCC00"];
     return colors[index % colors.length];
   };
 
@@ -126,12 +111,8 @@ export default function Analytics() {
       return (
         <View style={styles.noDataContainer}>
           <Text style={styles.noDataText}>No expense data available</Text>
-          <Text style={styles.noDataSubtext}>
-            Add some expenses to see your spending breakdown in a pie chart format.
-          </Text>
-          <Text style={styles.noDataSubtext}>
-            💡 Tip: Use the &quot;Dev Tools&quot; button on the dashboard to add sample data for testing.
-          </Text>
+          <Text style={styles.noDataSubtext}>Add some expenses to see your spending breakdown in a pie chart format.</Text>
+          <Text style={styles.noDataSubtext}>💡 Tip: Use the &quot;Dev Tools&quot; button on the dashboard to add sample data for testing.</Text>
         </View>
       );
     }
@@ -145,7 +126,7 @@ export default function Analytics() {
             {categoryData.map((item, index) => {
               // Calculate rotation for visual distribution
               const rotation = categoryData.slice(0, index).reduce((acc, curr) => acc + curr.percentage * 3.6, 0);
-              
+
               return (
                 <View
                   key={`donut-${item.category}`}
@@ -154,14 +135,14 @@ export default function Analytics() {
                     {
                       backgroundColor: getBarColor(index),
                       transform: [{ rotate: `${rotation}deg` }],
-                    }
+                    },
                   ]}
                 />
               );
             })}
             <View style={styles.donutCenter}>
               <Text style={styles.donutCenterText}>Total</Text>
-              <Text style={styles.donutCenterAmount}>${totalExpenses.toFixed(0)}</Text>
+              <Text style={styles.donutCenterAmount}>₹{totalExpenses.toFixed(0)}</Text>
             </View>
           </View>
         </View>
@@ -177,7 +158,7 @@ export default function Analytics() {
                   {
                     width: `${Math.max(8, item.percentage)}%`,
                     backgroundColor: getBarColor(index),
-                  }
+                  },
                 ]}
               />
               <Text style={styles.pieBarLabel}>
@@ -192,19 +173,10 @@ export default function Analytics() {
           <Text style={styles.pieChartSubtitle}>Category Details</Text>
           {categoryData.map((item, index) => (
             <View key={item.category} style={styles.pieSegmentContainer}>
-              <View
-                style={[
-                  styles.pieColorBox,
-                  { backgroundColor: getBarColor(index) }
-                ]}
-              />
+              <View style={[styles.pieColorBox, { backgroundColor: getBarColor(index) }]} />
               <Text style={styles.pieLegend}>{item.category}</Text>
-              <Text style={styles.piePercentage}>
-                {item.percentage.toFixed(1)}%
-              </Text>
-              <Text style={styles.pieAmount}>
-                ${item.total.toFixed(2)}
-              </Text>
+              <Text style={styles.piePercentage}>{item.percentage.toFixed(1)}%</Text>
+              <Text style={styles.pieAmount}>₹{item.total.toFixed(2)}</Text>
             </View>
           ))}
         </View>
@@ -215,12 +187,10 @@ export default function Analytics() {
   const renderBarChart = () => {
     if (categoryData.length === 0) {
       return (
-        <View style={[styles.noDataContainer, { backgroundColor: theme.colors.background + '80' }]}>
+        <View style={[styles.noDataContainer, { backgroundColor: theme.colors.background + "80" }]}>
           <MaterialIcons name="trending-up" size={48} color={theme.colors.textSecondary} />
           <Text style={[styles.noDataText, { color: theme.colors.text }]}>No expense data available</Text>
-          <Text style={[styles.noDataSubtext, { color: theme.colors.textSecondary }]}>
-            Add some expenses to see your spending breakdown
-          </Text>
+          <Text style={[styles.noDataSubtext, { color: theme.colors.textSecondary }]}>Add some expenses to see your spending breakdown</Text>
         </View>
       );
     }
@@ -231,22 +201,12 @@ export default function Analytics() {
           <View key={item.category} style={[styles.categoryRow, { backgroundColor: theme.colors.background }]}>
             <View style={styles.categoryInfo}>
               <View style={styles.categoryHeader}>
-                <MaterialIcons 
-                  name={getCategoryIcon(item.category) as any} 
-                  size={20} 
-                  color={getBarColor(index)} 
-                />
-                <Text style={[styles.categoryName, { color: theme.colors.text }]}>
-                  {item.category}
-                </Text>
+                <MaterialIcons name={getCategoryIcon(item.category) as any} size={20} color={getBarColor(index)} />
+                <Text style={[styles.categoryName, { color: theme.colors.text }]}>{item.category}</Text>
               </View>
               <View style={styles.categoryAmountContainer}>
-                <Text style={[styles.categoryAmount, { color: theme.colors.text }]}>
-                  ${item.total.toFixed(2)}
-                </Text>
-                <Text style={[styles.categoryPercentage, { color: theme.colors.textSecondary }]}>
-                  {item.percentage.toFixed(1)}%
-                </Text>
+                <Text style={[styles.categoryAmount, { color: theme.colors.text }]}>₹{item.total.toFixed(2)}</Text>
+                <Text style={[styles.categoryPercentage, { color: theme.colors.textSecondary }]}>{item.percentage.toFixed(1)}%</Text>
               </View>
             </View>
             <View style={[styles.barContainer, { backgroundColor: theme.colors.border }]}>
@@ -273,9 +233,7 @@ export default function Analytics() {
         <View style={[styles.header, { backgroundColor: theme.colors.background }]}>
           <View style={styles.headerContent}>
             <Text style={[styles.title, { color: theme.colors.text }]}>Analytics</Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-              {getTimeRangeLabel()} Overview
-            </Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>{getTimeRangeLabel()} Overview</Text>
           </View>
           <TouchableOpacity
             style={[styles.refreshButton, { backgroundColor: theme.colors.surface }]}
@@ -289,24 +247,20 @@ export default function Analytics() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Time Range Selector */}
           <View style={[styles.timeRangeCard, { backgroundColor: theme.colors.surface }]}>
             <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Time Period</Text>
             <View style={styles.timeRangeSelector}>
-              {(['week', 'month', 'year'] as const).map((range) => (
+              {(["week", "month", "year"] as const).map((range) => (
                 <TouchableOpacity
                   key={range}
                   style={[
                     styles.timeRangeButton,
                     {
-                      backgroundColor: timeRange === range ? theme.colors.primary : 'transparent',
+                      backgroundColor: timeRange === range ? theme.colors.primary : "transparent",
                       borderColor: theme.colors.border,
-                    }
+                    },
                   ]}
                   onPress={() => {
                     setTimeRange(range);
@@ -314,14 +268,16 @@ export default function Analytics() {
                   }}
                   activeOpacity={0.8}
                 >
-                  <Text style={[
-                    styles.timeRangeButtonText,
-                    {
-                      color: timeRange === range ? 'white' : theme.colors.text,
-                      fontWeight: timeRange === range ? '600' : '400',
-                    }
-                  ]}>
-                    {range === 'week' ? '7 Days' : range === 'month' ? 'Month' : 'Year'}
+                  <Text
+                    style={[
+                      styles.timeRangeButtonText,
+                      {
+                        color: timeRange === range ? "white" : theme.colors.text,
+                        fontWeight: timeRange === range ? "600" : "400",
+                      },
+                    ]}
+                  >
+                    {range === "week" ? "7 Days" : range === "month" ? "Month" : "Year"}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -334,26 +290,18 @@ export default function Analytics() {
               <MaterialIcons name="account-balance-wallet" size={24} color={theme.colors.primary} />
               <Text style={[styles.totalLabel, { color: theme.colors.textSecondary }]}>Total Spent</Text>
             </View>
-            <Text style={[styles.totalAmount, { color: theme.colors.primary }]}>
-              ${totalExpenses.toFixed(2)}
-            </Text>
+            <Text style={[styles.totalAmount, { color: theme.colors.primary }]}>₹{totalExpenses.toFixed(2)}</Text>
             <View style={[styles.totalDivider, { backgroundColor: theme.colors.border }]} />
             <View style={styles.totalStats}>
               <View style={styles.statItem}>
-                <Text style={[styles.statValue, { color: theme.colors.text }]}>
-                  {categoryData.length}
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
-                  Categories
-                </Text>
+                <Text style={[styles.statValue, { color: theme.colors.text }]}>{categoryData.length}</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>Categories</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={[styles.statValue, { color: theme.colors.text }]}>
-                  ${categoryData.length > 0 ? (totalExpenses / categoryData.length).toFixed(0) : '0'}
+                  ₹{categoryData.length > 0 ? (totalExpenses / categoryData.length).toFixed(0) : "0"}
                 </Text>
-                <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
-                  Avg/Category
-                </Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>Avg/Category</Text>
               </View>
             </View>
           </View>
@@ -363,61 +311,35 @@ export default function Analytics() {
             <View style={styles.chartHeader}>
               <View style={styles.chartTitleContainer}>
                 <MaterialIcons name="bar-chart" size={20} color={theme.colors.primary} />
-                <Text style={[styles.chartTitle, { color: theme.colors.text }]}>
-                  Spending by Category
-                </Text>
+                <Text style={[styles.chartTitle, { color: theme.colors.text }]}>Spending by Category</Text>
               </View>
               <View style={[styles.chartToggle, { backgroundColor: theme.colors.background }]}>
                 <TouchableOpacity
-                  style={[
-                    styles.toggleButton,
-                    chartType === 'bar' && { backgroundColor: theme.colors.primary }
-                  ]}
+                  style={[styles.toggleButton, chartType === "bar" && { backgroundColor: theme.colors.primary }]}
                   onPress={() => {
-                    setChartType('bar');
+                    setChartType("bar");
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
                   activeOpacity={0.8}
                 >
-                  <MaterialIcons 
-                    name="bar-chart" 
-                    size={16} 
-                    color={chartType === 'bar' ? 'white' : theme.colors.textSecondary} 
-                  />
-                  <Text style={[
-                    styles.toggleButtonText,
-                    { color: chartType === 'bar' ? 'white' : theme.colors.textSecondary }
-                  ]}>
-                    Bar
-                  </Text>
+                  <MaterialIcons name="bar-chart" size={16} color={chartType === "bar" ? "white" : theme.colors.textSecondary} />
+                  <Text style={[styles.toggleButtonText, { color: chartType === "bar" ? "white" : theme.colors.textSecondary }]}>Bar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[
-                    styles.toggleButton,
-                    chartType === 'pie' && { backgroundColor: theme.colors.primary }
-                  ]}
+                  style={[styles.toggleButton, chartType === "pie" && { backgroundColor: theme.colors.primary }]}
                   onPress={() => {
-                    setChartType('pie');
+                    setChartType("pie");
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
                   activeOpacity={0.8}
                 >
-                  <MaterialIcons 
-                    name="pie-chart" 
-                    size={16} 
-                    color={chartType === 'pie' ? 'white' : theme.colors.textSecondary} 
-                  />
-                  <Text style={[
-                    styles.toggleButtonText,
-                    { color: chartType === 'pie' ? 'white' : theme.colors.textSecondary }
-                  ]}>
-                    Pie
-                  </Text>
+                  <MaterialIcons name="pie-chart" size={16} color={chartType === "pie" ? "white" : theme.colors.textSecondary} />
+                  <Text style={[styles.toggleButtonText, { color: chartType === "pie" ? "white" : theme.colors.textSecondary }]}>Pie</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            
-            {chartType === 'bar' ? renderBarChart() : renderPieChart()}
+
+            {chartType === "bar" ? renderBarChart() : renderPieChart()}
           </View>
         </ScrollView>
       </Animated.View>
@@ -434,9 +356,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingTop: 10,
     paddingBottom: 24,
   },
@@ -445,21 +367,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 16,
     marginTop: 4,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   refreshButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
@@ -469,7 +391,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
@@ -477,11 +399,11 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 16,
   },
   timeRangeSelector: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderRadius: 12,
     padding: 4,
   },
@@ -490,37 +412,37 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
     marginHorizontal: 2,
   },
   timeRangeButtonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   totalCard: {
     borderRadius: 16,
     padding: 24,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
   totalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   totalLabel: {
     fontSize: 16,
     marginLeft: 8,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   totalAmount: {
     fontSize: 36,
-    fontWeight: '700',
+    fontWeight: "700",
     letterSpacing: -0.5,
     marginBottom: 16,
   },
@@ -529,55 +451,55 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   totalStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '500',
-    textTransform: 'uppercase',
+    fontWeight: "500",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   chartCard: {
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
   chartHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   chartTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   chartTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 8,
   },
   chartToggle: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderRadius: 8,
     padding: 3,
   },
   toggleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 6,
@@ -585,7 +507,7 @@ const styles = StyleSheet.create({
   },
   toggleButtonText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
     marginLeft: 4,
   },
   barChartContainer: {
@@ -594,7 +516,7 @@ const styles = StyleSheet.create({
   categoryRow: {
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.02,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
@@ -604,70 +526,70 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
   },
   categoryName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 8,
   },
   categoryAmountContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   categoryAmount: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   categoryPercentage: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   barContainer: {
     height: 8,
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   bar: {
-    height: '100%',
+    height: "100%",
     borderRadius: 4,
     minWidth: 8,
   },
   noDataContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 40,
     borderRadius: 12,
     marginVertical: 20,
   },
   noDataText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: 16,
     marginBottom: 8,
   },
   noDataSubtext: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
   },
   // Pie chart styles (keeping existing ones for compatibility)
   pieChartContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   pieVisualContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
     padding: 15,
     borderRadius: 10,
   },
   pieVisualRow: {
     marginVertical: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   pieVisualBar: {
     height: 20,
@@ -677,23 +599,23 @@ const styles = StyleSheet.create({
   },
   pieBarLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   donutChartContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   donutChart: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#e0e0e0',
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#e0e0e0",
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
   },
   donutSegment: {
-    position: 'absolute',
+    position: "absolute",
     width: 8,
     height: 40,
     borderRadius: 4,
@@ -703,36 +625,36 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
   donutCenterText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   donutCenterAmount: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   pieLegendContainer: {
-    width: '100%',
+    width: "100%",
     marginTop: 10,
   },
   pieChartSubtitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
   pieSegmentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -747,19 +669,19 @@ const styles = StyleSheet.create({
   pieLegend: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   piePercentage: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     minWidth: 50,
-    textAlign: 'right',
+    textAlign: "right",
     marginRight: 10,
   },
   pieAmount: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     minWidth: 70,
-    textAlign: 'right',
+    textAlign: "right",
   },
 });

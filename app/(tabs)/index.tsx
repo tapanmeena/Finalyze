@@ -167,17 +167,17 @@ export default function ModernDashboard() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.balanceAmount}>${expenseSums.thisMonth.toFixed(2)}</Text>
+      <Text style={styles.balanceAmount}>₹{expenseSums.thisMonth.toFixed(2)}</Text>
 
       <View style={styles.balanceFooter}>
         <View style={styles.balanceItem}>
           <Text style={styles.balanceSubLabel}>Today</Text>
-          <Text style={styles.balanceSubAmount}>${expenseSums.today.toFixed(2)}</Text>
+          <Text style={styles.balanceSubAmount}>₹{expenseSums.today.toFixed(2)}</Text>
         </View>
         <View style={styles.balanceDivider} />
         <View style={styles.balanceItem}>
           <Text style={styles.balanceSubLabel}>This Week</Text>
-          <Text style={styles.balanceSubAmount}>${expenseSums.thisWeek.toFixed(2)}</Text>
+          <Text style={styles.balanceSubAmount}>₹{expenseSums.thisWeek.toFixed(2)}</Text>
         </View>
       </View>
     </LinearGradient>
@@ -228,7 +228,7 @@ export default function ModernDashboard() {
                     <Text style={[styles.expenseDate, { color: theme.colors.textSecondary }]}>{new Date(expense.date).toLocaleDateString()}</Text>
                   </View>
                 </View>
-                <Text style={[styles.expenseAmount, { color: theme.colors.error }]}>-${expense.amount.toFixed(2)}</Text>
+                <Text style={[styles.expenseAmount, { color: theme.colors.error }]}>-₹{expense.amount.toFixed(2)}</Text>
               </View>
               {index < recentExpenses.length - 1 && <View style={[styles.expenseDivider, { backgroundColor: theme.colors.border }]} />}
             </View>

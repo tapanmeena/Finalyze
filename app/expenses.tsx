@@ -2,14 +2,14 @@ import { db } from '@/utils/database';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface Expense {
@@ -112,7 +112,7 @@ export default function Expenses() {
   const renderExpenseItem = ({ item }: { item: Expense }) => (
     <View style={styles.expenseCard}>
       <View style={styles.expenseHeader}>
-        <Text style={styles.expenseAmount}>${item.amount.toFixed(2)}</Text>
+        <Text style={styles.expenseAmount}>₹{item.amount.toFixed(2)}</Text>
         <Text style={styles.expenseDate}>{formatDate(item.date)}</Text>
       </View>
       <View style={styles.expenseDetails}>

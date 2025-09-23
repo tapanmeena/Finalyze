@@ -83,7 +83,7 @@ export default function MilestonesScreen() {
         {
           id: '2',
           title: 'Budget Tracker',
-          description: 'Keep monthly expenses under $500',
+          description: 'Keep monthly expenses under ₹500',
           target: 500,
           current: monthTotal,
           type: 'budget',
@@ -123,7 +123,7 @@ export default function MilestonesScreen() {
         {
           id: '6',
           title: 'Budget Champion',
-          description: 'Keep monthly expenses under $1000',
+          description: 'Keep monthly expenses under ₹1000',
           target: 1000,
           current: monthTotal,
           type: 'budget',
@@ -224,7 +224,7 @@ export default function MilestonesScreen() {
           </View>
           <Text style={[styles.progressText, { color: theme.colors.textSecondary }]}>
             {milestone.type === 'budget' 
-              ? `$${milestone.current.toFixed(2)} / $${milestone.target}`
+              ? `₹${milestone.current.toFixed(2)} / ₹${milestone.target}`
               : `${milestone.current} / ${milestone.target}`
             }
           </Text>
@@ -281,7 +281,7 @@ export default function MilestonesScreen() {
         <View style={styles.statsContainer}>
           <View style={[styles.statCard, { backgroundColor: theme.colors.surface }]}>
             <Text style={[styles.statNumber, { color: theme.colors.primary }]}>
-              ${totalExpenses.toFixed(2)}
+              ₹{totalExpenses.toFixed(2)}
             </Text>
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               Total Tracked
