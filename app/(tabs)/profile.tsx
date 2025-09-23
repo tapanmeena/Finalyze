@@ -31,7 +31,7 @@ interface SettingsSection {
 export default function ProfileScreen() {
   const { theme, currentTheme } = useTheme();
   const router = useRouter();
-  const [userName] = useState('Tapan'); // In a real app, this would come from user data
+  const [userName] = useState('Tapan'); // TODO: In a real app, this would come from user data
 
   const profileSections: SettingsSection[] = [
     {

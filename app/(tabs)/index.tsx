@@ -1,22 +1,12 @@
-import { useTheme } from '@/contexts/ThemeContext';
-import { db, initDB } from '@/utils/database';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    Dimensions,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { useTheme } from "@/contexts/ThemeContext";
+import { db, initDB } from "@/utils/database";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 interface ExpenseSum {
   today: number;
@@ -49,16 +39,16 @@ export default function ModernDashboard() {
   });
   const [recentExpenses, setRecentExpenses] = useState<RecentExpense[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [greeting, setGreeting] = useState('');
-  
+  const [greeting, setGreeting] = useState("");
+
   const router = useRouter();
   const { theme } = useTheme();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
   };
 
   const loadData = useCallback(async () => {
@@ -74,20 +64,20 @@ export default function ModernDashboard() {
   }, [loadData]);
 
   const loadExpenseSums = () => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const monthAgo = new Date();
     monthAgo.setMonth(monthAgo.getMonth() - 1);
 
     try {
-      const todayResult = db.getFirstSync('SELECT SUM(amount) as total FROM expenses WHERE date = ?', [today]) as any;
+      const todayResult = db.getFirstSync("SELECT SUM(amount) as total FROM expenses WHERE date = ?", [today]) as any;
       const todayTotal = todayResult?.total || 0;
 
-      const weekResult = db.getFirstSync('SELECT SUM(amount) as total FROM expenses WHERE date >= ?', [weekAgo.toISOString().split('T')[0]]) as any;
+      const weekResult = db.getFirstSync("SELECT SUM(amount) as total FROM expenses WHERE date >= ?", [weekAgo.toISOString().split("T")[0]]) as any;
       const weekTotal = weekResult?.total || 0;
 
-      const monthResult = db.getFirstSync('SELECT SUM(amount) as total FROM expenses WHERE date >= ?', [monthAgo.toISOString().split('T')[0]]) as any;
+      const monthResult = db.getFirstSync("SELECT SUM(amount) as total FROM expenses WHERE date >= ?", [monthAgo.toISOString().split("T")[0]]) as any;
       const monthTotal = monthResult?.total || 0;
 
       setExpenseSums({
@@ -96,69 +86,69 @@ export default function ModernDashboard() {
         thisMonth: monthTotal,
       });
     } catch (error) {
-      console.error('Error loading expense sums:', error);
+      console.error("Error loading expense sums:", error);
     }
   };
 
   const loadRecentExpenses = () => {
     try {
       const result = db.getAllSync(
-        'SELECT id, amount, category, description, date FROM expenses ORDER BY date DESC, id DESC LIMIT 5'
+        "SELECT id, amount, category, description, date FROM expenses ORDER BY date DESC, id DESC LIMIT 5"
       ) as RecentExpense[];
       setRecentExpenses(result);
     } catch (error) {
-      console.error('Error loading recent expenses:', error);
+      console.error("Error loading recent expenses:", error);
     }
   };
 
   const quickActions: QuickAction[] = [
     {
-      id: '1',
-      title: 'Quick Add',
-      subtitle: 'Log expense',
-      icon: 'add-circle',
+      id: "1",
+      title: "Quick Add",
+      subtitle: "Log expense",
+      icon: "add-circle",
       color: theme.colors.primary,
-      route: '/add-expense',
+      route: "/add-expense",
     },
     {
-      id: '2',
-      title: 'Categories',
-      subtitle: 'Manage',
-      icon: 'grid',
+      id: "2",
+      title: "Categories",
+      subtitle: "Manage",
+      icon: "grid",
       color: theme.colors.secondary,
-      route: '/categories',
+      route: "/categories",
     },
     {
-      id: '3',
-      title: 'Budgets',
-      subtitle: 'Set limits',
-      icon: 'wallet',
+      id: "3",
+      title: "Budgets",
+      subtitle: "Set limits",
+      icon: "wallet",
       color: theme.colors.accent,
-      route: '/budget',
+      route: "/budget",
     },
     {
-      id: '4',
-      title: 'Bills',
-      subtitle: 'Track due',
-      icon: 'receipt',
+      id: "4",
+      title: "Bills",
+      subtitle: "Track due",
+      icon: "receipt",
       color: theme.colors.warning,
-      route: '/bills',
+      route: "/bills",
     },
   ];
 
   const navigateToRoute = (route: string) => {
     switch (route) {
-      case '/add-expense':
-        router.push('/add-expense');
+      case "/add-expense":
+        router.push("/add-expense");
         break;
-      case '/categories':
-        router.push('/categories');
+      case "/categories":
+        router.push("/categories");
         break;
-      case '/budget':
-        router.push('/budget');
+      case "/budget":
+        router.push("/budget");
         break;
-      case '/bills':
-        router.push('/bills');
+      case "/bills":
+        router.push("/bills");
         break;
       default:
         break;
@@ -166,27 +156,19 @@ export default function ModernDashboard() {
   };
 
   const renderBalanceCard = () => (
-    <LinearGradient
-      colors={[theme.colors.primary, theme.colors.secondary]}
-      style={styles.balanceCard}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
+    <LinearGradient colors={[theme.colors.primary, theme.colors.secondary]} style={styles.balanceCard} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
       <View style={styles.balanceHeader}>
         <View>
           <Text style={styles.greetingText}>{greeting}!</Text>
           <Text style={styles.balanceLabel}>This Month&apos;s Spending</Text>
         </View>
-        <TouchableOpacity 
-          style={styles.settingsButton}
-          onPress={() => router.push('/themes')}
-        >
+        <TouchableOpacity style={styles.settingsButton} onPress={() => router.push("/themes")}>
           <Ionicons name="settings-outline" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      
+
       <Text style={styles.balanceAmount}>${expenseSums.thisMonth.toFixed(2)}</Text>
-      
+
       <View style={styles.balanceFooter}>
         <View style={styles.balanceItem}>
           <Text style={styles.balanceSubLabel}>Today</Text>
@@ -212,15 +194,11 @@ export default function ModernDashboard() {
             onPress={() => navigateToRoute(action.route)}
             activeOpacity={0.7}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: action.color + '20' }]}>
+            <View style={[styles.quickActionIcon, { backgroundColor: action.color + "20" }]}>
               <Ionicons name={action.icon as any} size={24} color={action.color} />
             </View>
-            <Text style={[styles.quickActionTitle, { color: theme.colors.text }]}>
-              {action.title}
-            </Text>
-            <Text style={[styles.quickActionSubtitle, { color: theme.colors.textSecondary }]}>
-              {action.subtitle}
-            </Text>
+            <Text style={[styles.quickActionTitle, { color: theme.colors.text }]}>{action.title}</Text>
+            <Text style={[styles.quickActionSubtitle, { color: theme.colors.textSecondary }]}>{action.subtitle}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -231,50 +209,36 @@ export default function ModernDashboard() {
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Recent Expenses</Text>
-        <TouchableOpacity onPress={() => router.push('/expenses')}>
+        <TouchableOpacity onPress={() => router.push("/expenses")}>
           <Text style={[styles.seeAllText, { color: theme.colors.primary }]}>See All</Text>
         </TouchableOpacity>
       </View>
-      
+
       {recentExpenses.length > 0 ? (
         <View style={[styles.expensesContainer, { backgroundColor: theme.colors.surface }]}>
           {recentExpenses.map((expense, index) => (
             <View key={expense.id}>
               <View style={styles.expenseItem}>
                 <View style={styles.expenseLeft}>
-                  <View style={[styles.expenseIcon, { backgroundColor: theme.colors.primary + '20' }]}>
-                    <Text style={styles.expenseIconText}>
-                      {expense.category.charAt(0).toUpperCase()}
-                    </Text>
+                  <View style={[styles.expenseIcon, { backgroundColor: theme.colors.primary + "20" }]}>
+                    <Text style={styles.expenseIconText}>{expense.category.charAt(0).toUpperCase()}</Text>
                   </View>
                   <View style={styles.expenseDetails}>
-                    <Text style={[styles.expenseDescription, { color: theme.colors.text }]}>
-                      {expense.description || expense.category}
-                    </Text>
-                    <Text style={[styles.expenseDate, { color: theme.colors.textSecondary }]}>
-                      {new Date(expense.date).toLocaleDateString()}
-                    </Text>
+                    <Text style={[styles.expenseDescription, { color: theme.colors.text }]}>{expense.description || expense.category}</Text>
+                    <Text style={[styles.expenseDate, { color: theme.colors.textSecondary }]}>{new Date(expense.date).toLocaleDateString()}</Text>
                   </View>
                 </View>
-                <Text style={[styles.expenseAmount, { color: theme.colors.error }]}>
-                  -${expense.amount.toFixed(2)}
-                </Text>
+                <Text style={[styles.expenseAmount, { color: theme.colors.error }]}>-${expense.amount.toFixed(2)}</Text>
               </View>
-              {index < recentExpenses.length - 1 && (
-                <View style={[styles.expenseDivider, { backgroundColor: theme.colors.border }]} />
-              )}
+              {index < recentExpenses.length - 1 && <View style={[styles.expenseDivider, { backgroundColor: theme.colors.border }]} />}
             </View>
           ))}
         </View>
       ) : (
         <View style={[styles.emptyState, { backgroundColor: theme.colors.surface }]}>
           <Ionicons name="receipt-outline" size={48} color={theme.colors.textSecondary} />
-          <Text style={[styles.emptyStateText, { color: theme.colors.textSecondary }]}>
-            No expenses yet
-          </Text>
-          <Text style={[styles.emptyStateSubtext, { color: theme.colors.textSecondary }]}>
-            Start tracking your spending
-          </Text>
+          <Text style={[styles.emptyStateText, { color: theme.colors.textSecondary }]}>No expenses yet</Text>
+          <Text style={[styles.emptyStateSubtext, { color: theme.colors.textSecondary }]}>Start tracking your spending</Text>
         </View>
       )}
     </View>
@@ -282,26 +246,17 @@ export default function ModernDashboard() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar 
-        barStyle={theme.dark ? 'light-content' : 'dark-content'} 
-        backgroundColor={theme.colors.background}
-      />
-      
+      <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
+
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={loadData}
-            tintColor={theme.colors.primary}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadData} tintColor={theme.colors.primary} />}
       >
         {renderBalanceCard()}
         {renderQuickActions()}
         {renderRecentExpenses()}
-        
+
         <View style={styles.bottomSpacing} />
       </ScrollView>
     </SafeAreaView>
@@ -319,7 +274,7 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 24,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 4,
@@ -329,32 +284,32 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   balanceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 20,
   },
   greetingText: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: "rgba(255, 255, 255, 0.9)",
     marginBottom: 4,
   },
   balanceLabel: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: "rgba(255, 255, 255, 0.8)",
   },
   settingsButton: {
     padding: 8,
   },
   balanceAmount: {
     fontSize: 36,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginBottom: 20,
   },
   balanceFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   balanceItem: {
     flex: 1,
@@ -362,49 +317,49 @@ const styles = StyleSheet.create({
   balanceDivider: {
     width: 1,
     height: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
     marginHorizontal: 16,
   },
   balanceSubLabel: {
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: "rgba(255, 255, 255, 0.8)",
     marginBottom: 4,
   },
   balanceSubAmount: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
   section: {
     marginHorizontal: 20,
     marginBottom: 24,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   seeAllText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   quickActionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   quickActionCard: {
     width: (width - 60) / 2,
     padding: 20,
     borderRadius: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -417,13 +372,13 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 12,
   },
   quickActionTitle: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   quickActionSubtitle: {
@@ -432,7 +387,7 @@ const styles = StyleSheet.create({
   expensesContainer: {
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -442,35 +397,35 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   expenseItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 12,
   },
   expenseLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   expenseIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 12,
   },
   expenseIconText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
+    fontWeight: "bold",
+    color: "#666",
   },
   expenseDetails: {
     flex: 1,
   },
   expenseDescription: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 2,
   },
   expenseDate: {
@@ -478,7 +433,7 @@ const styles = StyleSheet.create({
   },
   expenseAmount: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   expenseDivider: {
     height: 1,
@@ -487,8 +442,8 @@ const styles = StyleSheet.create({
   emptyState: {
     padding: 40,
     borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -499,7 +454,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 16,
     marginBottom: 4,
   },
