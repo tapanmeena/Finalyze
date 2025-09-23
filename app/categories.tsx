@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+    Alert,
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+} from "react-native";
 import { db } from "../utils/database";
 
 interface Category {
@@ -205,31 +218,38 @@ export default function Categories() {
       </View>
 
       <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editingCategory ? "Edit Category" : "Add New Category"}</Text>
+        <KeyboardAvoidingView 
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>{editingCategory ? "Edit Category" : "Add New Category"}</Text>
 
-            <Text style={styles.inputLabel}>Category Name</Text>
-            <TextInput style={styles.input} value={categoryName} onChangeText={setCategoryName} placeholder="Enter category name..." maxLength={50} />
+                <Text style={styles.inputLabel}>Category Name</Text>
+                <TextInput style={styles.input} value={categoryName} onChangeText={setCategoryName} placeholder="Enter category name..." maxLength={50} />
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => {
-                  setModalVisible(false);
-                  setCategoryName("");
-                  setEditingCategory(null);
-                }}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => {
+                      setModalVisible(false);
+                      setCategoryName("");
+                      setEditingCategory(null);
+                    }}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
 
-              <TouchableOpacity style={styles.saveButton} onPress={handleSaveCategory}>
-                <Text style={styles.saveButtonText}>{editingCategory ? "Update" : "Save"}</Text>
-              </TouchableOpacity>
+                  <TouchableOpacity style={styles.saveButton} onPress={handleSaveCategory}>
+                    <Text style={styles.saveButtonText}>{editingCategory ? "Update" : "Save"}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </ScrollView>
   );

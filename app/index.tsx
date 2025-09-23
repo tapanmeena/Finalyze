@@ -147,6 +147,27 @@ export default function Dashboard() {
       </TouchableOpacity>
 
       <TouchableOpacity 
+        style={styles.recurringButton}
+        onPress={() => router.push('./recurring')}
+      >
+        <Text style={styles.recurringButtonText}>Recurring Expenses</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.billsButton}
+        onPress={() => router.push('./bills')}
+      >
+        <Text style={styles.billsButtonText}>Bills Tracker</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.suggestionsButton}
+        onPress={() => router.push('./suggestions')}
+      >
+        <Text style={styles.suggestionsButtonText}>Smart Categories</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
         style={styles.budgetButton}
         onPress={() => router.push('./budget')}
       >
@@ -247,6 +268,42 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   analyticsButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  recurringButton: {
+    backgroundColor: '#FF6B6B',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  recurringButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  billsButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  billsButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  suggestionsButton: {
+    backgroundColor: '#9C27B0',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  suggestionsButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

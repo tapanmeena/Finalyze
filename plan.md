@@ -87,44 +87,12 @@ Build on the core functionality to introduce smart features like recurring expen
 
    * Use machine learning or rule-based logic to suggest categories based on past behavior. Example: if a user frequently logs "Coffee" under a certain amount, the app will auto-suggest the "Coffee" category for future similar entries.
 
-3. **Expense Import/Receipt Scanner**:
-
-   * Integrate OCR (Optical Character Recognition) to allow users to scan receipts and automatically extract the amount and merchant info.
-   * Allow users to manually upload images or take pictures of receipts.
-
-4. **Bill Tracking & Reminders**:
-
-   * Add functionality for users to log bills like rent, utilities, and subscriptions.
-   * Set up reminders for bill due dates and allow users to mark them as "paid".
-
-5. **Advanced Reports & Data Export**:
-
-   * Provide users with downloadable reports in CSV, Excel, or PDF format.
-   * Implement monthly/weekly summaries that highlight overspending or savings.
-
-6. **Multi-Account & Multiple Users**:
-
-   * Allow users to manage multiple bank accounts or wallets within the app.
-   * Enable shared expenses for family or roommates with automatic splitting and tracking.
-
 ---
 
 #### **Milestones for Phase 2**:
 
 * **Week 9-10**: Implement recurring expenses and notifications.
-* **Week 11-12**: Develop expense suggestion algorithm and receipt scanning feature.
-* **Week 13-14**: Build bill tracking system with reminders.
-* **Week 15-16**: Implement CSV/Excel export and shared accounts.
-* **Week 17**: Testing and bug fixing.
-
----
-
-#### **Technology/Tools**:
-
-* **OCR**: Tesseract.js or Google Vision API for receipt scanning.
-* **Notifications**: Firebase Cloud Messaging for reminders.
-* **Machine Learning**: TensorFlow Lite or a simpler rule-based algorithm for expense suggestions.
-* **Export/Reporting**: Node.js or backend framework to generate CSV/Excel.
+* **Week 11-12**: Develop expense suggestion algorithm;
 
 ---
 

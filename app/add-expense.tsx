@@ -1,15 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
     ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
-import { db } from '../utils/database';
+import { db, getSuggestionForExpense } from '../utils/database';
 
 const paymentMethods = [
   'Cash',
@@ -25,6 +30,7 @@ export default function AddExpense() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
   
   const router = useRouter();
 
@@ -70,9 +76,42 @@ export default function AddExpense() {
     }
   };
 
+  const handleDescriptionChange = (text: string) => {
+    setDescription(text);
+    
+    // Get smart suggestion when user types description
+    if (text.trim().length > 3) {
+      try {
+        const suggestion = getSuggestionForExpense(text);
+        setSuggestedCategory(suggestion);
+      } catch (error) {
+        console.error('Error getting suggestion:', error);
+        setSuggestedCategory(null);
+      }
+    } else {
+      setSuggestedCategory(null);
+    }
+  };
+
+  const applySuggestion = () => {
+    if (suggestedCategory) {
+      setSelectedCategory(suggestedCategory);
+      setSuggestedCategory(null);
+    }
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Add New Expense</Text>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView 
+          style={styles.container}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}
+        >
+          <Text style={styles.title}>Add New Expense</Text>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Amount *</Text>
@@ -152,11 +191,22 @@ export default function AddExpense() {
         <TextInput
           style={[styles.input, styles.textArea]}
           value={description}
-          onChangeText={setDescription}
+          onChangeText={handleDescriptionChange}
           placeholder="Optional description..."
           multiline
           numberOfLines={3}
         />
+        {suggestedCategory && (
+          <TouchableOpacity style={styles.suggestionBanner} onPress={applySuggestion}>
+            <View style={styles.suggestionContent}>
+              <Ionicons name="bulb-outline" size={16} color="#FF9800" />
+              <Text style={styles.suggestionText}>
+                Suggested category: <Text style={styles.suggestionCategory}>{suggestedCategory}</Text>
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color="#FF9800" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveExpense}>
@@ -166,7 +216,9 @@ export default function AddExpense() {
       <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
       </TouchableOpacity>
-    </ScrollView>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -175,6 +227,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     padding: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 24,
@@ -259,5 +315,30 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  suggestionBanner: {
+    backgroundColor: '#FFF3E0',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#FFB74D',
+  },
+  suggestionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  suggestionText: {
+    fontSize: 14,
+    color: '#E65100',
+    marginLeft: 8,
+  },
+  suggestionCategory: {
+    fontWeight: 'bold',
+    color: '#FF9800',
   },
 });
