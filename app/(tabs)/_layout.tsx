@@ -58,6 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="analytics"
         options={{
+          title: "Analytics",
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart" size={size} color={color} />,
         }}
@@ -65,6 +66,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="add-expense"
         options={{
+          title: "Add",
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Ionicons name="add-circle" size={size} color={color} />,
         }}
