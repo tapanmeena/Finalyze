@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
   balanceCard: {
     margin: 20,
-    marginTop: Platform.OS === 'android' ? 40 : 20,
+    marginTop: Platform.OS === "android" ? 40 : 20,
     padding: 24,
     borderRadius: 20,
     shadowColor: "#000",
