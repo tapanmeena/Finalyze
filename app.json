@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "spend-log",
-    "slug": "spend-log",
+    "name": "finsight",
+    "slug": "finsight",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

@@ -1,5 +1,5 @@
 {
-  "name": "spend-log",
+  "name": "finsight",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {

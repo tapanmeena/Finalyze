@@ -4,7 +4,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ThemeScreen() {
-  const { theme, currentTheme, setTheme, toggleDarkMode } = useTheme();
+  const { theme, currentTheme, setTheme } = useTheme();
   const router = useRouter();
 
   const renderThemeOption = (themeKey: ThemeKey, themeData: Theme) => {
@@ -94,19 +94,7 @@ export default function ThemeScreen() {
           )}
         </View>
 
-        <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={[
-              styles.quickActionButton,
-              { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={toggleDarkMode}
-          >
-            <Text style={styles.quickActionText}>
-              {currentTheme === 'dark' ? '☀️ Switch to Light' : '🌙 Switch to Dark'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+
 
         <View style={styles.infoSection}>
           <Text style={[styles.infoTitle, { color: theme.colors.text }]}>
@@ -214,19 +202,6 @@ const styles = StyleSheet.create({
   themeDescription: {
     fontSize: 14,
     lineHeight: 20,
-  },
-  quickActions: {
-    marginBottom: 30,
-  },
-  quickActionButton: {
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  quickActionText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   infoSection: {
     marginBottom: 30,

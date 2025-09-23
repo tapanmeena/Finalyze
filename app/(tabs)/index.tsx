@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { Dimensions, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Platform, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -162,8 +162,8 @@ export default function ModernDashboard() {
           <Text style={styles.greetingText}>{greeting}!</Text>
           <Text style={styles.balanceLabel}>This Month&apos;s Spending</Text>
         </View>
-        <TouchableOpacity style={styles.settingsButton} onPress={() => router.push("/themes")}>
-          <Ionicons name="settings-outline" size={24} color="white" />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => router.push("/insights")}>
+          <Ionicons name="analytics-outline" size={24} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -272,6 +272,7 @@ const styles = StyleSheet.create({
   },
   balanceCard: {
     margin: 20,
+    marginTop: Platform.OS === 'android' ? 40 : 20,
     padding: 24,
     borderRadius: 20,
     shadowColor: "#000",
@@ -343,6 +344,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    marginBottom: 20,
   },
   seeAllText: {
     fontSize: 14,
