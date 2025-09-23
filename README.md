@@ -1,50 +1,142 @@
-# Welcome to your Expo app 👋
+# Spend Log - Personal Expense Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile app built with Expo for tracking personal expenses and managing budgets.
 
-## Get started
+## � Features
 
-1. Install dependencies
+### Phase 1 (MVP) - ✅ Completed
+- **Expense Logging**: Manually input expenses with amount, date, category, payment method, and description
+- **Dashboard Overview**: View spending summaries for today, this week, and this month
+- **Categories & Budgeting**: Pre-defined categories (Food, Transport, Entertainment, etc.) with customizable options
+- **Basic Analytics**: Simple visualization of spending by category with bar charts
+- **Search & Filters**: Search expenses by amount, category, or date range
+- **SQLite Database**: Local data storage using Expo SQLite
 
-   ```bash
-   npm install
-   ```
+### Upcoming Features (Phase 2)
+- Recurring expenses tracking
+- Expense suggestions based on past behavior
+- Receipt scanning with OCR
+- Bill tracking and reminders
+- Data export (CSV, Excel, PDF)
+- Multi-account support
 
-2. Start the app
+## 🚀 Getting Started
 
-   ```bash
-   npx expo start
-   ```
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or pnpm
+- Expo CLI
+- Expo Go app on your mobile device
 
-In the output, you'll find options to open the app in a
+### Installation
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+1. Clone the repository:
 ```bash
-npm run reset-project
+git clone <repository-url>
+cd spend-log
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Install dependencies:
+```bash
+npm install
+# or
+pnpm install
+```
 
-## Learn more
+3. Start the development server:
+```bash
+npm start
+# or
+pnpm start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+4. Open the Expo Go app on your mobile device and scan the QR code
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 📂 Project Structure
 
-## Join the community
+```
+app/
+├── _layout.tsx          # Root navigation layout
+├── index.tsx            # Dashboard screen
+├── add-expense.tsx      # Add new expense screen
+├── expenses.tsx         # View all expenses screen
+├── analytics.tsx        # Analytics and charts screen
+└── database.js          # SQLite database setup
+```
 
-Join our community of developers creating universal apps.
+## 🎯 Usage
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Adding an Expense
+1. Tap "Add Expense" on the dashboard
+2. Enter the amount, select date, category, and payment method
+3. Optionally add a description
+4. Tap "Save Expense"
+
+### Viewing Expenses
+1. Tap "View All Expenses" on the dashboard
+2. Use the search bar to filter expenses
+3. View detailed information for each expense
+
+### Analytics
+1. Tap "View Analytics" on the dashboard
+2. See spending breakdown by category
+3. View current month totals and percentages
+
+## 🛠 Technology Stack
+
+- **Frontend**: React Native with Expo
+- **Navigation**: Expo Router
+- **Database**: Expo SQLite
+- **Charts**: Custom bar charts (React Native components)
+- **State Management**: React Hooks
+- **Styling**: StyleSheet API
+
+## 📈 Development Phases
+
+### Phase 1: Core Functionality (Current)
+- ✅ Basic expense logging
+- ✅ Dashboard with spending summaries
+- ✅ Categories and payment methods
+- ✅ Simple analytics with bar charts
+- ✅ Search and filter functionality
+
+### Phase 2: Enhancements (Planned)
+- Recurring expenses
+- Smart expense suggestions
+- Receipt scanning (OCR)
+- Bill tracking and reminders
+- Data export capabilities
+- Multi-account support
+
+### Phase 3: UI/UX Improvements (Planned)
+- Customizable themes
+- Light/dark mode
+- Progress tracking and milestones
+- Micro-interactions and animations
+- Enhanced navigation
+
+### Phase 4: Advanced Features (Planned)
+- Cross-platform syncing
+- Social sharing
+- Bank API integration
+- Collaborative expense tracking
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📞 Support
+
+For support, please open an issue in the GitHub repository.
+
+---
+
+**Happy expense tracking! 💰📊**
