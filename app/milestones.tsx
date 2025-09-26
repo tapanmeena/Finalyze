@@ -1,7 +1,8 @@
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { db } from '@/utils/database';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Milestone {
@@ -26,22 +27,13 @@ interface Achievement {
 
 export default function MilestonesScreen() {
   const { theme } = useTheme();
+  const { formatCurrency, formatNumber } = useCurrency();
   const router = useRouter();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [totalExpenses, setTotalExpenses] = useState(0);
 
-  useEffect(() => {
-    const loadData = () => {
-      loadTotalExpenses();
-      generateMilestones();
-      loadAchievements();
-    };
-
-    loadData();
-  }, []);
-
-  const loadTotalExpenses = () => {
+  const loadTotalExpenses = useCallback(() => {
     try {
       const result = db.getFirstSync('SELECT SUM(amount) as total FROM expenses') as any;
       const total = result?.total || 0;
@@ -49,9 +41,9 @@ export default function MilestonesScreen() {
     } catch (error) {
       console.error('Error loading total expenses:', error);
     }
-  };
+  }, []);
 
-  const generateMilestones = () => {
+  const generateMilestones = useCallback(() => {
     try {
       // Get current month expenses
       const currentMonth = new Date().toISOString().slice(0, 7);
@@ -83,7 +75,7 @@ export default function MilestonesScreen() {
         {
           id: '2',
           title: 'Budget Tracker',
-          description: 'Keep monthly expenses under ₹500',
+          description: `Keep monthly expenses under ${formatCurrency(500, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
           target: 500,
           current: monthTotal,
           type: 'budget',
@@ -123,7 +115,7 @@ export default function MilestonesScreen() {
         {
           id: '6',
           title: 'Budget Champion',
-          description: 'Keep monthly expenses under ₹1000',
+          description: `Keep monthly expenses under ${formatCurrency(1000, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
           target: 1000,
           current: monthTotal,
           type: 'budget',
@@ -136,9 +128,9 @@ export default function MilestonesScreen() {
     } catch (error) {
       console.error('Error generating milestones:', error);
     }
-  };
+  }, [formatCurrency]);
 
-  const loadAchievements = () => {
+  const loadAchievements = useCallback(() => {
     // For now, generate achievements based on completed milestones
     const sampleAchievements: Achievement[] = [
       {
@@ -158,7 +150,13 @@ export default function MilestonesScreen() {
     ];
 
     setAchievements(sampleAchievements);
-  };
+  }, []);
+
+  useEffect(() => {
+    loadTotalExpenses();
+    generateMilestones();
+    loadAchievements();
+  }, [generateMilestones, loadAchievements, loadTotalExpenses]);
 
   const getProgressPercentage = (current: number, target: number): number => {
     return Math.min((current / target) * 100, 100);
@@ -200,7 +198,12 @@ export default function MilestonesScreen() {
               {milestone.title}
             </Text>
             <Text style={[styles.milestoneDescription, { color: theme.colors.textSecondary }]}>
-              {milestone.description}
+              {milestone.type === 'budget'
+                ? `Keep monthly expenses under ${formatCurrency(milestone.target, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}`
+                : milestone.description}
             </Text>
           </View>
           {milestone.achieved && (
@@ -222,11 +225,10 @@ export default function MilestonesScreen() {
               ]}
             />
           </View>
-          <Text style={[styles.progressText, { color: theme.colors.textSecondary }]}>
-            {milestone.type === 'budget' 
-              ? `₹${milestone.current.toFixed(2)} / ₹${milestone.target}`
-              : `${milestone.current} / ${milestone.target}`
-            }
+          <Text style={[styles.progressText, { color: theme.colors.textSecondary }] }>
+            {milestone.type === 'budget'
+              ? `${formatCurrency(milestone.current)} / ${formatCurrency(milestone.target)}`
+              : `${formatNumber(milestone.current, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} / ${formatNumber(milestone.target, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
           </Text>
         </View>
       </View>
@@ -281,7 +283,7 @@ export default function MilestonesScreen() {
         <View style={styles.statsContainer}>
           <View style={[styles.statCard, { backgroundColor: theme.colors.surface }]}>
             <Text style={[styles.statNumber, { color: theme.colors.primary }]}>
-              ₹{totalExpenses.toFixed(2)}
+              {formatCurrency(totalExpenses)}
             </Text>
             <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
               Total Tracked

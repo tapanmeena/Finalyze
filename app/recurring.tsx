@@ -1,22 +1,24 @@
+import { useCurrency } from '@/contexts/CurrencyContext';
+import { Theme, useTheme } from '@/contexts/ThemeContext';
 import { addRecurringExpense, deleteRecurringExpense, getAllRecurringExpenses, processRecurringExpenses, toggleRecurringExpense } from '@/utils/database';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  FlatList,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    Alert,
+    FlatList,
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
 
 interface RecurringExpense {
@@ -53,6 +55,10 @@ export default function RecurringExpensesScreen() {
     'Bills', 'Subscriptions', 'Utilities', 'Rent', 'Insurance',
     'Food', 'Transport', 'Entertainment', 'Healthcare', 'Other'
   ];
+
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+  const { formatCurrency, currencySymbol } = useCurrency();
 
   useEffect(() => {
     loadRecurringExpenses();
@@ -136,11 +142,16 @@ export default function RecurringExpensesScreen() {
 
   const getFrequencyColor = (frequency: string) => {
     switch (frequency) {
-      case 'daily': return '#FF6B6B';
-      case 'weekly': return '#4ECDC4';
-      case 'monthly': return '#45B7D1';
-      case 'yearly': return '#96CEB4';
-      default: return '#95A5A6';
+      case 'daily':
+        return theme.colors.accent;
+      case 'weekly':
+        return theme.colors.secondary;
+      case 'monthly':
+        return theme.colors.primary;
+      case 'yearly':
+        return theme.colors.success;
+      default:
+        return theme.colors.border;
     }
   };
 
@@ -164,14 +175,14 @@ export default function RecurringExpensesScreen() {
             {item.name}
           </Text>
           <Text style={[styles.expenseAmount, !item.isActive && styles.inactiveText]}>
-            ₹{item.amount.toFixed(2)}
+            {formatCurrency(item.amount)}
           </Text>
         </View>
         <Switch
           value={item.isActive}
           onValueChange={() => handleToggleExpense(item.id, item.isActive)}
-          trackColor={{ false: '#E0E0E0', true: '#4CAF50' }}
-          thumbColor={item.isActive ? '#ffffff' : '#f4f3f4'}
+          trackColor={{ false: theme.colors.border, true: theme.colors.success }}
+          thumbColor={item.isActive ? theme.colors.card : theme.colors.surface }
         />
       </View>
 
@@ -207,10 +218,15 @@ export default function RecurringExpensesScreen() {
         style={styles.deleteButton}
         onPress={() => handleDeleteExpense(item.id, item.name)}
       >
-        <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
+        <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
       </TouchableOpacity>
     </View>
   );
+
+  const activeRecurringExpenses = recurringExpenses.filter((expense) => expense.isActive);
+  const activeMonthlyTotal = activeRecurringExpenses
+    .filter((expense) => expense.frequency === 'monthly')
+    .reduce((sum, expense) => sum + expense.amount, 0);
 
   return (
     <View style={styles.container}>
@@ -219,26 +235,23 @@ export default function RecurringExpensesScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Recurring Expenses</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setModalVisible(true)}
         >
-          <Ionicons name="add" size={24} color="#4CAF50" />
+          <Ionicons name="add" size={24} color={theme.colors.secondary} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.summary}>
         <Text style={styles.summaryText}>
-          {recurringExpenses.filter(e => e.isActive).length} active recurring expenses
+          {activeRecurringExpenses.length} active recurring expenses
         </Text>
         <Text style={styles.summaryAmount}>
-          Monthly total: ₹{recurringExpenses
-            .filter(e => e.isActive && e.frequency === 'monthly')
-            .reduce((sum, e) => sum + e.amount, 0)
-            .toFixed(2)}
+          {`Monthly total: ${formatCurrency(activeMonthlyTotal)}`}
         </Text>
       </View>
 
@@ -250,7 +263,7 @@ export default function RecurringExpensesScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="calendar-outline" size={64} color="#BDC3C7" />
+            <Ionicons name="calendar-outline" size={64} color={theme.colors.border} />
             <Text style={styles.emptyText}>No recurring expenses yet</Text>
             <Text style={styles.emptySubtext}>
               Add your first recurring expense to start automating your budget tracking
@@ -279,7 +292,7 @@ export default function RecurringExpensesScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Add Recurring Expense</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#333" />
+                <Ionicons name="close" size={24} color={theme.colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -288,14 +301,16 @@ export default function RecurringExpensesScreen() {
               placeholder="Expense name (e.g., Netflix Subscription)"
               value={newExpense.name}
               onChangeText={(text) => setNewExpense({...newExpense, name: text})}
+              placeholderTextColor={theme.colors.textSecondary}
             />
 
             <TextInput
               style={styles.input}
-              placeholder="Amount"
+              placeholder={`${currencySymbol}0.00`}
               value={newExpense.amount}
               onChangeText={(text) => setNewExpense({...newExpense, amount: text})}
               keyboardType="numeric"
+              placeholderTextColor={theme.colors.textSecondary}
             />
 
             <View style={styles.pickerContainer}>
@@ -357,6 +372,7 @@ export default function RecurringExpensesScreen() {
               onChangeText={(text) => setNewExpense({...newExpense, description: text})}
               multiline
               numberOfLines={3}
+              placeholderTextColor={theme.colors.textSecondary}
             />
 
             <TouchableOpacity style={styles.saveButton} onPress={handleAddExpense}>
@@ -372,235 +388,242 @@ export default function RecurringExpensesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  backButton: {
-    padding: 5,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  addButton: {
-    padding: 5,
-  },
-  summary: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  summaryText: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
-  },
-  summaryAmount: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-  },
-  list: {
-    flex: 1,
-    padding: 20,
-  },
-  expenseCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  inactiveCard: {
-    opacity: 0.6,
-  },
-  expenseHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  expenseInfo: {
-    flex: 1,
-  },
-  expenseName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  expenseAmount: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-  },
-  inactiveText: {
-    color: '#999',
-  },
-  expenseDetails: {
-    marginBottom: 12,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  detailValue: {
-    fontSize: 14,
-    color: '#333',
-  },
-  frequencyBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  frequencyText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-    textTransform: 'capitalize',
-  },
-  overdueText: {
-    color: '#FF6B6B',
-    fontWeight: 'bold',
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    padding: 4,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 100,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
-    textAlign: 'center',
-    paddingHorizontal: 40,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalScrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
-    width: '90%',
-    maxHeight: '80%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 16,
-    backgroundColor: '#F8F9FA',
-  },
-  descriptionInput: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  pickerContainer: {
-    marginBottom: 16,
-  },
-  pickerLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
-  },
-  categoryChip: {
-    backgroundColor: '#F0F0F0',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  frequencyChip: {
-    backgroundColor: '#F0F0F0',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  selectedChip: {
-    backgroundColor: '#4CAF50',
-  },
-  chipText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  selectedChipText: {
-    color: '#FFFFFF',
-    fontWeight: '500',
-  },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  saveButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingTop: 60,
+      paddingBottom: 20,
+      backgroundColor: theme.colors.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    backButton: {
+      padding: 5,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+    },
+    addButton: {
+      padding: 5,
+    },
+    summary: {
+      backgroundColor: theme.colors.card,
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    summaryText: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      marginBottom: 5,
+    },
+    summaryAmount: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+    },
+    list: {
+      flex: 1,
+      padding: 20,
+    },
+    expenseCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 12,
+      elevation: 2,
+      shadowColor: theme.colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    },
+    inactiveCard: {
+      opacity: 0.6,
+    },
+    expenseHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    expenseInfo: {
+      flex: 1,
+    },
+    expenseName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      marginBottom: 4,
+    },
+    expenseAmount: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.colors.secondary,
+    },
+    inactiveText: {
+      color: theme.colors.textSecondary,
+    },
+    expenseDetails: {
+      marginBottom: 12,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    detailLabel: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontWeight: '500',
+    },
+    detailValue: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    frequencyBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    frequencyText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: 'bold',
+      textTransform: 'capitalize',
+    },
+    overdueText: {
+      color: theme.colors.error,
+      fontWeight: 'bold',
+    },
+    deleteButton: {
+      position: 'absolute',
+      top: 16,
+      right: 16,
+      padding: 4,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: 100,
+    },
+    emptyText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      marginTop: 16,
+      textAlign: 'center',
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginTop: 8,
+      textAlign: 'center',
+      paddingHorizontal: 40,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.colors.modalOverlay,
+    },
+    modalScrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 20,
+      padding: 20,
+      width: '90%',
+      maxHeight: '80%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      marginBottom: 16,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.text,
+    },
+    descriptionInput: {
+      height: 80,
+      textAlignVertical: 'top',
+    },
+    pickerContainer: {
+      marginBottom: 16,
+    },
+    pickerLabel: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: theme.colors.text,
+      marginBottom: 8,
+    },
+    categoryChip: {
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 16,
+      marginRight: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    frequencyChip: {
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 16,
+      marginRight: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    selectedChip: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    chipText: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    selectedChipText: {
+      color: '#FFFFFF',
+      fontWeight: '500',
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 8,
+      padding: 16,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    saveButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+  });

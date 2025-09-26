@@ -1,22 +1,23 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { db, getSuggestionForExpense } from "@/utils/database";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Alert,
-  Animated,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    Alert,
+    Animated,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 
 const paymentMethods = ["Cash", "Credit Card", "Debit Card", "Digital Wallet"];
@@ -37,7 +38,6 @@ export default function AddExpense() {
   useEffect(() => {
     loadCategories();
 
-    // Fade in animation
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
@@ -45,10 +45,17 @@ export default function AddExpense() {
     }).start();
   }, [fadeAnim]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCategories();
+    }, [])
+  );
+
   const loadCategories = () => {
     try {
-      const result = db.getAllSync("SELECT name FROM categories ORDER BY name") as any[];
-      setCategories(result.map((row) => row.name));
+  const result = db.getAllSync("SELECT name FROM categories ORDER BY name COLLATE NOCASE") as any[];
+  const uniqueCategories = Array.from(new Set(result.map((row) => String(row.name).trim()))).filter(Boolean);
+  setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error loading categories:", error);
       // Fallback to hardcoded categories if database fails

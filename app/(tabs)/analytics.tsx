@@ -1,3 +1,4 @@
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { db } from "@/utils/database";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ export default function Analytics() {
   const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("month");
 
   const { theme } = useTheme();
+  const { formatCurrency, formatNumber } = useCurrency();
   const fadeAnim = React.useMemo(() => new Animated.Value(0), []);
 
   const loadAnalytics = React.useCallback(() => {
@@ -142,7 +144,7 @@ export default function Analytics() {
             })}
             <View style={styles.donutCenter}>
               <Text style={styles.donutCenterText}>Total</Text>
-              <Text style={styles.donutCenterAmount}>₹{totalExpenses.toFixed(0)}</Text>
+              <Text style={styles.donutCenterAmount}>{formatCurrency(totalExpenses, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</Text>
             </View>
           </View>
         </View>
@@ -162,7 +164,10 @@ export default function Analytics() {
                 ]}
               />
               <Text style={styles.pieBarLabel}>
-                {item.category} - {item.percentage.toFixed(1)}%
+                {item.category} - {`${formatNumber(item.percentage, {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}%`}
               </Text>
             </View>
           ))}
@@ -175,8 +180,10 @@ export default function Analytics() {
             <View key={item.category} style={styles.pieSegmentContainer}>
               <View style={[styles.pieColorBox, { backgroundColor: getBarColor(index) }]} />
               <Text style={styles.pieLegend}>{item.category}</Text>
-              <Text style={styles.piePercentage}>{item.percentage.toFixed(1)}%</Text>
-              <Text style={styles.pieAmount}>₹{item.total.toFixed(2)}</Text>
+              <Text style={styles.piePercentage}>
+                {`${formatNumber(item.percentage, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`}
+              </Text>
+              <Text style={styles.pieAmount}>{formatCurrency(item.total)}</Text>
             </View>
           ))}
         </View>
@@ -205,8 +212,10 @@ export default function Analytics() {
                 <Text style={[styles.categoryName, { color: theme.colors.text }]}>{item.category}</Text>
               </View>
               <View style={styles.categoryAmountContainer}>
-                <Text style={[styles.categoryAmount, { color: theme.colors.text }]}>₹{item.total.toFixed(2)}</Text>
-                <Text style={[styles.categoryPercentage, { color: theme.colors.textSecondary }]}>{item.percentage.toFixed(1)}%</Text>
+                <Text style={[styles.categoryAmount, { color: theme.colors.text }]}>{formatCurrency(item.total)}</Text>
+                <Text style={[styles.categoryPercentage, { color: theme.colors.textSecondary }]}>
+                  {`${formatNumber(item.percentage, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`}
+                </Text>
               </View>
             </View>
             <View style={[styles.barContainer, { backgroundColor: theme.colors.border }]}>
@@ -290,7 +299,9 @@ export default function Analytics() {
               <MaterialIcons name="account-balance-wallet" size={24} color={theme.colors.primary} />
               <Text style={[styles.totalLabel, { color: theme.colors.textSecondary }]}>Total Spent</Text>
             </View>
-            <Text style={[styles.totalAmount, { color: theme.colors.primary }]}>₹{totalExpenses.toFixed(2)}</Text>
+            <Text style={[styles.totalAmount, { color: theme.colors.primary }]}>
+              {formatCurrency(totalExpenses)}
+            </Text>
             <View style={[styles.totalDivider, { backgroundColor: theme.colors.border }]} />
             <View style={styles.totalStats}>
               <View style={styles.statItem}>
@@ -299,7 +310,10 @@ export default function Analytics() {
               </View>
               <View style={styles.statItem}>
                 <Text style={[styles.statValue, { color: theme.colors.text }]}>
-                  ₹{categoryData.length > 0 ? (totalExpenses / categoryData.length).toFixed(0) : "0"}
+                  {formatCurrency(categoryData.length > 0 ? totalExpenses / categoryData.length : 0, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
                 </Text>
                 <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>Avg/Category</Text>
               </View>

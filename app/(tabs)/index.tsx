@@ -1,3 +1,4 @@
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { db, initDB } from "@/utils/database";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,6 +44,7 @@ export default function ModernDashboard() {
 
   const router = useRouter();
   const { theme } = useTheme();
+  const { formatCurrency } = useCurrency();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -167,17 +169,17 @@ export default function ModernDashboard() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.balanceAmount}>₹{expenseSums.thisMonth.toFixed(2)}</Text>
+  <Text style={styles.balanceAmount}>{formatCurrency(expenseSums.thisMonth)}</Text>
 
       <View style={styles.balanceFooter}>
         <View style={styles.balanceItem}>
           <Text style={styles.balanceSubLabel}>Today</Text>
-          <Text style={styles.balanceSubAmount}>₹{expenseSums.today.toFixed(2)}</Text>
+          <Text style={styles.balanceSubAmount}>{formatCurrency(expenseSums.today)}</Text>
         </View>
         <View style={styles.balanceDivider} />
         <View style={styles.balanceItem}>
           <Text style={styles.balanceSubLabel}>This Week</Text>
-          <Text style={styles.balanceSubAmount}>₹{expenseSums.thisWeek.toFixed(2)}</Text>
+          <Text style={styles.balanceSubAmount}>{formatCurrency(expenseSums.thisWeek)}</Text>
         </View>
       </View>
     </LinearGradient>
@@ -228,7 +230,7 @@ export default function ModernDashboard() {
                     <Text style={[styles.expenseDate, { color: theme.colors.textSecondary }]}>{new Date(expense.date).toLocaleDateString()}</Text>
                   </View>
                 </View>
-                <Text style={[styles.expenseAmount, { color: theme.colors.error }]}>-₹{expense.amount.toFixed(2)}</Text>
+                <Text style={[styles.expenseAmount, { color: theme.colors.error }]}>{formatCurrency(-expense.amount)}</Text>
               </View>
               {index < recentExpenses.length - 1 && <View style={[styles.expenseDivider, { backgroundColor: theme.colors.border }]} />}
             </View>

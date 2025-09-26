@@ -1,8 +1,9 @@
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { db } from "@/utils/database";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Animated, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface CategoryInsight {
@@ -22,34 +23,12 @@ interface Insight {
 
 export default function InsightsScreen() {
   const { theme } = useTheme();
+  const { formatCurrency, formatNumber } = useCurrency();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [topCategories, setTopCategories] = useState<CategoryInsight[]>([]);
 
   const fadeAnim = React.useMemo(() => new Animated.Value(0), []);
   const slideAnim = React.useMemo(() => new Animated.Value(50), []);
-
-  useEffect(() => {
-    const loadInsightsData = () => {
-      loadTopCategories();
-      generateInsights();
-    };
-
-    loadInsightsData();
-
-    // Start animations
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -79,7 +58,7 @@ export default function InsightsScreen() {
     return iconMap[category] || "category";
   };
 
-  const loadTopCategories = () => {
+  const loadTopCategories = useCallback(() => {
     try {
       const currentMonth = new Date().toISOString().slice(0, 7);
       const result = db.getAllSync(
@@ -95,38 +74,38 @@ export default function InsightsScreen() {
       const totalResult = db.getFirstSync("SELECT SUM(amount) as total FROM expenses WHERE date LIKE ?", [`${currentMonth}%`]) as any;
       const monthTotal = totalResult?.total || 0;
 
-      const categoryInsights: CategoryInsight[] = result.map((row) => ({
-        category: row.category,
-        amount: row.total,
-        percentage: monthTotal > 0 ? (row.total / monthTotal) * 100 : 0,
-        trend: "stable" as const, // Would need historical data for real trends
-      }));
+      const categoryInsights: CategoryInsight[] = result.map((row) => {
+        const percentage = monthTotal > 0 ? (row.total / monthTotal) * 100 : 0;
+        return {
+          category: row.category,
+          amount: row.total,
+          percentage: Math.min(100, percentage),
+          trend: "stable" as const,
+        };
+      });
 
       setTopCategories(categoryInsights);
     } catch (error) {
       console.error("Error loading top categories:", error);
     }
-  };
+  }, []);
 
-  const generateInsights = () => {
+  const generateInsights = useCallback(() => {
     try {
       const currentMonth = new Date().toISOString().slice(0, 7);
       const lastMonth = new Date();
       lastMonth.setMonth(lastMonth.getMonth() - 1);
       const lastMonthStr = lastMonth.toISOString().slice(0, 7);
 
-      // Get current and last month totals
       const currentResult = db.getFirstSync("SELECT SUM(amount) as total FROM expenses WHERE date LIKE ?", [`${currentMonth}%`]) as any;
       const currentTotal = currentResult?.total || 0;
 
       const lastResult = db.getFirstSync("SELECT SUM(amount) as total FROM expenses WHERE date LIKE ?", [`${lastMonthStr}%`]) as any;
       const lastTotal = lastResult?.total || 0;
 
-      // Get expense count
       const countResult = db.getFirstSync("SELECT COUNT(*) as count FROM expenses") as any;
       const expenseCount = countResult?.count || 0;
 
-      // Get most expensive category
       const categoryResult = db.getFirstSync(
         `SELECT category, SUM(amount) as total 
          FROM expenses 
@@ -139,15 +118,19 @@ export default function InsightsScreen() {
 
       const generatedInsights: Insight[] = [];
 
-      // Monthly comparison insight
       if (lastTotal > 0 && currentTotal > 0) {
         const change = ((currentTotal - lastTotal) / lastTotal) * 100;
+        const changeFormatted = formatNumber(change, {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        });
+
         if (change > 10) {
           generatedInsights.push({
             id: "1",
             type: "warning",
             title: "Spending Alert",
-            description: `Your spending is ${change.toFixed(1)}% higher than last month. Consider reviewing your budget.`,
+            description: `Your spending is ${changeFormatted}% higher than last month. Consider reviewing your budget.`,
             icon: "⚠️",
           });
         } else if (change < -10) {
@@ -155,37 +138,42 @@ export default function InsightsScreen() {
             id: "2",
             type: "achievement",
             title: "Great Savings!",
-            description: `You've reduced spending by ${Math.abs(change).toFixed(1)}% compared to last month. Well done!`,
+            description: `You've reduced spending by ${formatNumber(Math.abs(change), {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            })}% compared to last month. Well done!`,
             icon: "🎉",
           });
         }
       }
 
-      // Category insight
-      if (categoryResult && categoryResult.total > currentTotal * 0.4) {
+      if (categoryResult && currentTotal > 0 && categoryResult.total > currentTotal * 0.4) {
+        const categoryShare = (categoryResult.total / currentTotal) * 100;
         generatedInsights.push({
           id: "3",
           type: "tip",
           title: "Category Focus",
-          description: `${categoryResult.category} represents ${((categoryResult.total / currentTotal) * 100).toFixed(
-            1
-          )}% of your spending. Consider setting a specific budget for this category.`,
+          description: `${categoryResult.category} represents ${formatNumber(categoryShare, {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })}% of your spending. Consider setting a specific budget for this category.`,
           icon: "📊",
         });
       }
 
-      // Frequency insight
       if (expenseCount >= 20) {
         generatedInsights.push({
           id: "4",
           type: "tip",
           title: "Tracking Habits",
-          description: `You've logged ${expenseCount} expenses! You&apos;re building great financial awareness habits.`,
+          description: `You've logged ${formatNumber(expenseCount, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          })} expenses! You&apos;re building great financial awareness habits.`,
           icon: "💪",
         });
       }
 
-      // Weekend spending insight
       const weekendResult = db.getFirstSync(
         `SELECT SUM(amount) as total FROM expenses 
          WHERE date LIKE ? AND (
@@ -195,30 +183,30 @@ export default function InsightsScreen() {
       ) as any;
       const weekendTotal = weekendResult?.total || 0;
 
-      if (weekendTotal > currentTotal * 0.3) {
+      if (currentTotal > 0 && weekendTotal > currentTotal * 0.3) {
+        const weekendShare = (weekendTotal / currentTotal) * 100;
         generatedInsights.push({
           id: "5",
           type: "tip",
           title: "Weekend Spending",
-          description: `${((weekendTotal / currentTotal) * 100).toFixed(
-            1
-          )}% of your spending happens on weekends. Planning weekend activities in advance might help manage costs.`,
+          description: `${formatNumber(weekendShare, {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })}% of your spending happens on weekends. Planning weekend activities in advance might help manage costs.`,
           icon: "📅",
         });
       }
 
-      // Daily average insight
       const today = new Date();
-      const daysInMonth = today.getDate();
-      const dailyAverage = currentTotal / daysInMonth;
+      const daysElapsed = Math.max(today.getDate(), 1);
+      const dailyAverage = currentTotal / daysElapsed;
+      const projectedMonthly = dailyAverage * 30;
 
       generatedInsights.push({
         id: "6",
         type: "trend",
         title: "Daily Average",
-        description: `Your daily average spending this month is ₹${dailyAverage.toFixed(2)}. This puts you on track for ₹${(
-          dailyAverage * 30
-        ).toFixed(2)} monthly spending.`,
+        description: `Your daily average spending this month is ${formatCurrency(dailyAverage)}. This puts you on track for ${formatCurrency(projectedMonthly)} monthly spending.`,
         icon: "📈",
       });
 
@@ -226,7 +214,25 @@ export default function InsightsScreen() {
     } catch (error) {
       console.error("Error generating insights:", error);
     }
-  };
+  }, [formatCurrency, formatNumber]);
+
+  useEffect(() => {
+    loadTopCategories();
+    generateInsights();
+
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim, loadTopCategories, generateInsights]);
 
   const getInsightColor = (type: string) => {
     switch (type) {
@@ -290,10 +296,14 @@ export default function InsightsScreen() {
         </View>
         <View style={styles.categoryContent}>
           <Text style={[styles.categoryTitle, { color: theme.colors.text }]}>{category.category}</Text>
-          <Text style={[styles.categoryAmount, { color: theme.colors.primary }]}>₹{category.amount.toFixed(2)}</Text>
+          <Text style={[styles.categoryAmount, { color: theme.colors.primary }]}>
+            {formatCurrency(category.amount)}
+          </Text>
         </View>
         <View style={styles.categoryStats}>
-          <Text style={[styles.categoryPercentage, { color: theme.colors.success }]}>{category.percentage.toFixed(1)}%</Text>
+          <Text style={[styles.categoryPercentage, { color: theme.colors.success }]}>
+            {`${formatNumber(category.percentage, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`}
+          </Text>
           <Text style={[styles.categoryLabel, { color: theme.colors.textSecondary }]}>of total</Text>
         </View>
       </View>

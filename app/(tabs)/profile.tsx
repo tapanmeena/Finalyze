@@ -1,9 +1,10 @@
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Alert, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Modal, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ProfileOption {
   id: string;
@@ -21,10 +22,28 @@ interface SettingsSection {
 
 export default function ProfileScreen() {
   const { theme, currentTheme } = useTheme();
+  const { currency, currencySymbol, availableCurrencies, setCurrency } = useCurrency();
   const router = useRouter();
   const [userName] = useState("Tapan"); // TODO: In a real app, this would come from user data
+  const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
+
+  const activeCurrency = availableCurrencies.find((option) => option.code === currency) || availableCurrencies[0];
+  const currencySubtitle = `${currencySymbol} (${currency}) · ${activeCurrency.label}`;
 
   const profileSections: SettingsSection[] = [
+    {
+      title: "Preferences",
+      options: [
+        {
+          id: "currency",
+          title: "Currency",
+          subtitle: currencySubtitle,
+          icon: "cash",
+          route: "currency",
+          color: theme.colors.primary,
+        },
+      ],
+    },
     {
       title: "Appearance",
       options: [
@@ -108,6 +127,9 @@ export default function ProfileScreen() {
 
   const navigateToRoute = (route: string) => {
     switch (route) {
+      case "currency":
+        setCurrencyModalVisible(true);
+        break;
       case "/themes":
         router.push("/themes");
         break;
@@ -221,6 +243,50 @@ export default function ProfileScreen() {
     </View>
   );
 
+  const renderCurrencyModal = () => (
+    <Modal animationType="fade" transparent visible={currencyModalVisible} onRequestClose={() => setCurrencyModalVisible(false)}>
+      <View style={styles.currencyModalOverlay}>
+        <View style={[styles.currencyModalContent, { backgroundColor: theme.colors.surface }]}>
+          <View style={styles.currencyModalHeader}>
+            <Text style={[styles.currencyModalTitle, { color: theme.colors.text }]}>Select Currency</Text>
+            <TouchableOpacity style={styles.currencyModalClose} onPress={() => setCurrencyModalVisible(false)}>
+              <Ionicons name="close" size={20} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
+
+          {availableCurrencies.map((option) => {
+            const isSelected = option.code === currency;
+            return (
+              <TouchableOpacity
+                key={option.code}
+                style={[
+                  styles.currencyOption,
+                  {
+                    backgroundColor: isSelected ? theme.colors.primary + "10" : "transparent",
+                    borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+                activeOpacity={0.8}
+                onPress={async () => {
+                  await setCurrency(option.code);
+                  setCurrencyModalVisible(false);
+                }}
+              >
+                <View style={styles.currencyOptionInfo}>
+                  <Text style={[styles.currencyOptionLabel, { color: theme.colors.text }]}>{option.label}</Text>
+                  <Text style={[styles.currencyOptionSubLabel, { color: theme.colors.textSecondary }]}>
+                    {option.symbol} · {option.code}
+                  </Text>
+                </View>
+                {isSelected && <Ionicons name="checkmark-circle" size={20} color={theme.colors.primary} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} backgroundColor={theme.colors.background} />
@@ -234,6 +300,8 @@ export default function ProfileScreen() {
 
         <View style={styles.bottomSpacing} />
       </ScrollView>
+
+      {renderCurrencyModal()}
     </SafeAreaView>
   );
 }
@@ -361,5 +429,59 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 20,
+  },
+  currencyModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  currencyModalContent: {
+    width: "100%",
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  currencyModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  currencyModalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  currencyModalClose: {
+    padding: 6,
+    borderRadius: 16,
+  },
+  currencyOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginTop: 10,
+  },
+  currencyOptionInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  currencyOptionLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  currencyOptionSubLabel: {
+    fontSize: 12,
+    marginTop: 4,
   },
 });

@@ -1,11 +1,13 @@
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <Stack>
-        <Stack.Screen
+    <CurrencyProvider>
+      <ThemeProvider>
+        <Stack>
+          <Stack.Screen
           name="(tabs)"
           options={{
             headerShown: false,
@@ -110,7 +112,8 @@ export default function RootLayout() {
             },
           }}
         />
-      </Stack>
-    </ThemeProvider>
+        </Stack>
+      </ThemeProvider>
+    </CurrencyProvider>
   );
 }

@@ -1,14 +1,16 @@
+import { useCurrency } from '@/contexts/CurrencyContext';
+import { Theme, useTheme } from '@/contexts/ThemeContext';
 import { db } from '@/utils/database';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface BudgetItem {
@@ -34,6 +36,9 @@ export default function BudgetScreen() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [budgetAmount, setBudgetAmount] = useState('');
   const [editingBudget, setEditingBudget] = useState<BudgetItem | null>(null);
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+  const { formatCurrency, formatNumber, currencySymbol } = useCurrency();
 
   useEffect(() => {
     loadBudgets();
@@ -165,9 +170,9 @@ export default function BudgetScreen() {
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage <= 50) return '#34C759';
-    if (percentage <= 80) return '#FF9500';
-    return '#FF3B30';
+    if (percentage <= 50) return theme.colors.success;
+    if (percentage <= 80) return theme.colors.warning;
+    return theme.colors.error;
   };
 
   const renderBudgetProgress = () => {
@@ -192,13 +197,17 @@ export default function BudgetScreen() {
         </View>
         
         <View style={styles.progressInfo}>
-          <Text style={styles.budgetAmount}>Budget: ₹{item.budgetAmount.toFixed(2)}</Text>
-          <Text style={styles.spentAmount}>Spent: ₹{item.spent.toFixed(2)}</Text>
+          <Text style={styles.budgetAmount}>
+            {`Budget: ${formatCurrency(item.budgetAmount)}`}
+          </Text>
+          <Text style={styles.spentAmount}>
+            {`Spent: ${formatCurrency(item.spent)}`}
+          </Text>
           <Text style={[
             styles.remainingAmount,
-            { color: item.remaining >= 0 ? '#34C759' : '#FF3B30' }
+            { color: item.remaining >= 0 ? theme.colors.success : theme.colors.error }
           ]}>
-            {item.remaining >= 0 ? 'Remaining' : 'Over budget'}: ₹{Math.abs(item.remaining).toFixed(2)}
+            {item.remaining >= 0 ? 'Remaining' : 'Over budget'}: {formatCurrency(Math.abs(item.remaining))}
           </Text>
         </View>
 
@@ -215,7 +224,7 @@ export default function BudgetScreen() {
             />
           </View>
           <Text style={styles.progressPercentage}>
-            {item.percentage.toFixed(1)}%
+            {`${formatNumber(item.percentage, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`}
           </Text>
         </View>
       </View>
@@ -282,7 +291,8 @@ export default function BudgetScreen() {
               style={styles.input}
               value={budgetAmount}
               onChangeText={setBudgetAmount}
-              placeholder="0.00"
+              placeholder={`${currencySymbol}0.00`}
+              placeholderTextColor={theme.colors.textSecondary}
               keyboardType="numeric"
             />
 
@@ -327,212 +337,214 @@ export default function BudgetScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    marginTop: 40,
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 30,
-    color: '#666',
-  },
-  addButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  addButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  progressContainer: {
-    flex: 1,
-  },
-  progressCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  categoryName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  editText: {
-    color: '#007AFF',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  progressInfo: {
-    marginBottom: 15,
-  },
-  budgetAmount: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
-  },
-  spentAmount: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
-  },
-  remainingAmount: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  progressBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  progressBarBackground: {
-    flex: 1,
-    height: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginRight: 10,
-  },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 5,
-  },
-  progressPercentage: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-    minWidth: 50,
-    textAlign: 'right',
-  },
-  noDataText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#666',
-    marginTop: 50,
-    fontStyle: 'italic',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '90%',
-    maxHeight: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 10,
-    color: '#333',
-  },
-  categorySelector: {
-    marginBottom: 20,
-  },
-  categoryButton: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 20,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  selectedCategoryButton: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
-  },
-  categoryButtonText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  selectedCategoryButtonText: {
-    color: 'white',
-  },
-  input: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 20,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cancelButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 10,
-    flex: 1,
-    marginRight: 10,
-  },
-  cancelButtonText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#333',
-  },
-  saveButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 10,
-    flex: 1,
-  },
-  saveButtonText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  deleteButton: {
-    backgroundColor: '#FF3B30',
-    padding: 15,
-    borderRadius: 10,
-    flex: 1,
-    marginLeft: 10,
-  },
-  deleteButtonText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      padding: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 10,
+      marginTop: 40,
+      color: theme.colors.text,
+    },
+    subtitle: {
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: 30,
+      color: theme.colors.textSecondary,
+    },
+    addButton: {
+      backgroundColor: theme.colors.primary,
+      padding: 15,
+      borderRadius: 10,
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    addButtonText: {
+      color: '#ffffff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    progressContainer: {
+      flex: 1,
+    },
+    progressCard: {
+      backgroundColor: theme.colors.card,
+      padding: 20,
+      borderRadius: 10,
+      marginBottom: 15,
+      shadowColor: theme.colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    progressHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    categoryName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+    },
+    editText: {
+      color: theme.colors.primary,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    progressInfo: {
+      marginBottom: 15,
+    },
+    budgetAmount: {
+      fontSize: 16,
+      color: theme.colors.text,
+      marginBottom: 5,
+    },
+    spentAmount: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      marginBottom: 5,
+    },
+    remainingAmount: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    progressBarContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    progressBarBackground: {
+      flex: 1,
+      height: 10,
+      backgroundColor: theme.colors.border,
+      borderRadius: 5,
+      overflow: 'hidden',
+      marginRight: 10,
+    },
+    progressBarFill: {
+      height: '100%',
+      borderRadius: 5,
+    },
+    progressPercentage: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: theme.colors.text,
+      minWidth: 50,
+      textAlign: 'right',
+    },
+    noDataText: {
+      textAlign: 'center',
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      marginTop: 50,
+      fontStyle: 'italic',
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: theme.colors.modalOverlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContent: {
+      backgroundColor: theme.colors.card,
+      padding: 20,
+      borderRadius: 10,
+      width: '90%',
+      maxHeight: '80%',
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 20,
+      color: theme.colors.text,
+    },
+    inputLabel: {
+      fontSize: 16,
+      fontWeight: '500',
+      marginBottom: 10,
+      color: theme.colors.text,
+    },
+    categorySelector: {
+      marginBottom: 20,
+    },
+    categoryButton: {
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: 15,
+      paddingVertical: 10,
+      borderRadius: 20,
+      marginRight: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    selectedCategoryButton: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    categoryButtonText: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    selectedCategoryButtonText: {
+      color: '#ffffff',
+    },
+    input: {
+      backgroundColor: theme.colors.surface,
+      padding: 15,
+      borderRadius: 10,
+      fontSize: 16,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      marginBottom: 20,
+      color: theme.colors.text,
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    cancelButton: {
+      backgroundColor: theme.colors.surface,
+      padding: 15,
+      borderRadius: 10,
+      flex: 1,
+      marginRight: 10,
+    },
+    cancelButtonText: {
+      textAlign: 'center',
+      fontSize: 16,
+      color: theme.colors.text,
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary,
+      padding: 15,
+      borderRadius: 10,
+      flex: 1,
+    },
+    saveButtonText: {
+      textAlign: 'center',
+      fontSize: 16,
+      color: '#ffffff',
+      fontWeight: 'bold',
+    },
+    deleteButton: {
+      backgroundColor: theme.colors.error,
+      padding: 15,
+      borderRadius: 10,
+      flex: 1,
+      marginLeft: 10,
+    },
+    deleteButtonText: {
+      textAlign: 'center',
+      fontSize: 16,
+      color: '#ffffff',
+      fontWeight: 'bold',
+    },
+  });
